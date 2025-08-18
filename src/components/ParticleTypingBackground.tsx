@@ -47,6 +47,9 @@ function ParticlesText({
   position = [0, 0, 0],
   fade = 1,
   animated = true,
+  stickToMobileViewport = true,
+  mobileMargin = { left: 16, top: 80 }, // px dari tepi kiri & atas
+  mobileOffsetY = 0,
 }: {
   text: string;
   typing?: boolean;
@@ -55,10 +58,13 @@ function ParticlesText({
   position?: [number, number, number];
   fade?: number;
   animated?: boolean;
+  stickToMobileViewport?: boolean;
+  mobileMargin?: { left: number; top: number };
+  mobileOffsetY?: number;
 }) {
   // ===== Responsif berdasarkan lebar kanvas/fiber =====
-  const { size: vp } = useThree();
-  const isMobile = vp.width < 768;
+  const { viewport, size: viewSize } = useThree();
+  const isMobile = viewSize.width < 768;
 
   // font lebih kecil di mobile supaya muat
   const points = useTextPoints(text, isMobile ? 58 : 80);
@@ -93,7 +99,8 @@ function ParticlesText({
         positions[i * 3 + 1] = p.y;
         positions[i * 3 + 2] = p.z + (Math.random() - 0.5) * 6;
       });
-      geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));  
+      geo.computeBoundingBox
     }
     return geo;
   }, [visiblePoints]);
@@ -112,6 +119,22 @@ function ParticlesText({
     isMobile ? position[1] * 0.70 : position[1],
     position[2]
   ];
+
+  const groupPosition = useMemo<[number, number, number]>(() => {
+    if (!isMobile || !stickToMobileViewport || !geometry.boundingBox) return position as [number, number, number];
+
+    const bbox = geometry.boundingBox;
+    const textW = (bbox.max.x - bbox.min.x) * scale;
+    const textH = (bbox.max.y - bbox.min.y) * scale;
+
+    const factor = viewport.factor || 1; // px per 1 world-unit
+    const leftMarginWU = mobileMargin.left / factor;
+    const topMarginWU  = (mobileMargin.top + mobileOffsetY) / factor;
+
+    const x = -viewport.width / 2 + textW / 2 + leftMarginWU; // nempel kiri + margin
+    const y =  viewport.height / 2 - textH / 2 - topMarginWU; // nempel atas + margin
+    return [x, y, position[2]];
+  }, [isMobile, stickToMobileViewport, geometry, scale, viewport, mobileMargin.left, mobileMargin.top, mobileOffsetY, position]);
 
   return (
     <group position={pos as any} scale={scale}>
@@ -215,6 +238,7 @@ export default function ParticleTypingBackground() {
         position={[-260, 100, 0]}
         fade={alfredoFade}
         animated
+        mobileMargin={{ left: 16, top: 72 }}
       />
       {/* Baris kode di bawahnya */}
       <ParticlesText
