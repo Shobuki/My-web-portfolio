@@ -25,7 +25,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${playfair.variable} ${raleway.variable}`}>
-      <body className="bg-primary-black text-text-primary font-raleway">
+      <body className="bg-primary-black text-text-primary font-raleway overflow-x-hidden">
         {/* Pasang lebih awal agar window.openTetris cepat siap */}
         <Tetris />
 

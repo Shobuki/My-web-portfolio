@@ -16,9 +16,9 @@ export default function Home() {
         <Hero />
         <div
           style={{ background: 'var(--primary-black, #110809)' }}
-          className="px-4 py-20 md:px-10 lg:px-20"
+          className="px-0 sm:px-4 md:px-10 lg:px-20"   // ← mobile tanpa padding
         >
-          <div className="mx-auto max-w-screen-2xl">
+          <div className="mx-auto max-w-none lg:max-w-screen-2xl">  {/* ← mobile full width */}
             <AboutSection />
             <Projects />
             <Testimony />
