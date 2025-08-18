@@ -89,6 +89,7 @@ const MusicPlayer: React.FC = () => {
         return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
     }, [isPlaying, currentIndex]);
 
+
     const handlePlayPause = () => {
         if (!playerRef.current) return;
         if (isPlaying) {
@@ -194,7 +195,7 @@ const MusicPlayer: React.FC = () => {
     // === SATU TOMBOL SAJA (FAB) ===
     const ToggleOpenCloseButton = (
         <button
-            className="fixed bottom-4 right-4 z-[60] rounded-full p-3 shadow-lg bg-gradient-to-br from-[#4267b2] to-[#e71d36] text-white hover:scale-105 transition"
+            className="absolute bottom-4 right-4 z-[60] rounded-full p-3 shadow-lg bg-gradient-to-br from-[#4267b2] to-[#e71d36] text-white hover:scale-105 transition"
             onClick={() => setShowPanel(prev => !prev)}
             aria-label={showPanel ? "Tutup music player" : "Buka music player"}
             title={showPanel ? "Tutup music player" : "Buka music player"}
@@ -211,7 +212,7 @@ const MusicPlayer: React.FC = () => {
             {/* PANEL PLAYER (slide tetap ada; handle & tombol close dihapus) */}
             <motion.div
                 className={`
-                    fixed bottom-4 right-0 z-50
+                    absolute bottom-4 right-0 z-50
                     w-11/12 max-w-xs md:max-w-md
                     md:bottom-10
                     p-0 md:p-0
