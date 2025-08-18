@@ -31,10 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {children}
 
-        <div className="relative mx-auto max-w-screen-2xl overflow-hidden">
-          {/* semua pointer event diaktifkan lagi di komponen */}
-          <MusicPlayer />
-        </div>
+        <MusicPlayer />
       </body>
     </html>
   )
