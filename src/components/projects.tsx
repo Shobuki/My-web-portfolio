@@ -23,7 +23,7 @@ export default function Projects() {
       id: 1,
       title: "Sunflex Store User Website",
       description: "Sunway Trek Masindo Website for business",
-      images: ["/images/portfolio/sunflexuser.png","/images/portfolio/sunflexuser2.png"],
+      images: ["/images/portfolio/sunflexuser.png", "/images/portfolio/sunflexuser2.png"],
       tech: ["React", "Next.js", "Tailwind"],
       color: "from-blue-500 to-cyan-500",
     },
@@ -39,15 +39,15 @@ export default function Projects() {
       id: 3,
       title: "Whatsapp Bot Automation",
       description: "My project for automating WhatsApp messages also can play some mini games. I also try to integrate with some AI models. (STILL IN DEVELOPMENT)",
-      images: ["/images/portfolio/whatsapp/whatsapp.jpeg","/images/portfolio/whatsapp/whatsapp2.jpeg","/images/portfolio/whatsapp/whatsapp3.jpeg","/images/portfolio/whatsapp/whatsapp4.jpeg"],
-      tech: ["Node.js","Javascript"],
+      images: ["/images/portfolio/whatsapp/whatsapp.jpeg", "/images/portfolio/whatsapp/whatsapp2.jpeg", "/images/portfolio/whatsapp/whatsapp3.jpeg", "/images/portfolio/whatsapp/whatsapp4.jpeg"],
+      tech: ["Node.js", "Javascript"],
       color: "from-green-500 to-teal-500",
     },
     {
       id: 4,
       title: "Healthy Website Calculator",
       description: "Some project for AI testing to calculate healthy food with the recipe. I use KNN classification for this project also integrate with mistral AI model from Ollama",
-      images: ["/images/portfolio/food/1.png","/images/portfolio/food/2.png","/images/portfolio/food/3.png","/images/portfolio/food/4.png"],
+      images: ["/images/portfolio/food/1.png", "/images/portfolio/food/2.png", "/images/portfolio/food/3.png", "/images/portfolio/food/4.png"],
       tech: ["Python", "Streamlit", "Uvicorn"],
       color: "from-orange-500 to-red-500",
     },
@@ -55,7 +55,7 @@ export default function Projects() {
       id: 5,
       title: "Data Scraping Instagram & Twitter",
       description: "Program to scrape data from Instagram and Twitter using Node.js Puppeteer",
-      images: ["/images/portfolio/datascraping/data1.png","/images/portfolio/datascraping/data2.png",],
+      images: ["/images/portfolio/datascraping/data1.png", "/images/portfolio/datascraping/data2.png",],
       tech: ["Node.js"],
       color: "from-indigo-500 to-purple-500",
     },
@@ -135,46 +135,46 @@ export default function Projects() {
               className="project-card group w-full relative rounded-2xl bg-slate-900/50 backdrop-blur-md border border-[#b91c1c]/40 hover:border-[#b91c1c]/80 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-[#b91c1c]/30 overflow-hidden"
             >
               <div className="w-full aspect-[16/9] bg-black flex items-center justify-center relative">
-  {project.images ? (
-    <Swiper
-      className="w-full h-full"
-      spaceBetween={10}
-      slidesPerView={1}
-      navigation
-      modules={[Navigation]}
-    >
-      {project.images.map((img, index) => (
-        <SwiperSlide key={index}>
-          <Zoom>
-            {/* flex-center wrapper, biar pasti gambar di tengah */}
-            <div className="flex items-center justify-center w-full h-full">
-              <Image
-                src={img}
-                alt={project.title}
-                width={1200}
-                height={800}
-                className="object-contain max-h-full max-w-full mx-auto my-auto"
-                // HAPUS style manual height/width!
-              />
-            </div>
-          </Zoom>
-        </SwiperSlide>
-      ))}
-    </Swiper>
-  ) : (
-    <Zoom>
-      <div className="flex items-center justify-center w-full h-full">
-        <Image
-          src={project.image}
-          alt={project.title}
-          fill
-          sizes="(max-width: 768px) 100vw, 33vw"
-          className="object-contain max-h-full max-w-full mx-auto my-auto"
-        />
-      </div>
-    </Zoom>
-  )}
-</div>
+                {project.images ? (
+                  <Swiper
+                    className="w-full h-full"
+                    spaceBetween={10}
+                    slidesPerView={1}
+                    navigation
+                    modules={[Navigation]}
+                  >
+                    {project.images.map((img, index) => (
+                      <SwiperSlide key={index}>
+                        <Zoom>
+                          {/* flex-center wrapper, biar pasti gambar di tengah */}
+                          <div className="flex items-center justify-center w-full h-full">
+                            <Image
+                              src={img}
+                              alt={project.title}
+                              width={1200}
+                              height={800}
+                              className="object-contain max-h-full max-w-full mx-auto my-auto"
+                            // HAPUS style manual height/width!
+                            />
+                          </div>
+                        </Zoom>
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                ) : (
+                  <Zoom>
+                    <div className="flex items-center justify-center w-full h-full">
+                      <Image
+                        src={project.image}
+                        alt={project.title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-contain max-h-full max-w-full mx-auto my-auto"
+                      />
+                    </div>
+                  </Zoom>
+                )}
+              </div>
 
               <div className="p-6 space-y-2">
                 <h3 className="text-xl font-semibold text-white group-hover:text-[#b91c1c] transition-colors duration-300">
