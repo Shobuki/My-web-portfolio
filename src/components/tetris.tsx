@@ -83,6 +83,9 @@ export default function Tetris() {
   const [piece, setPiece] = useState<Piece>(() => spawnRandomPiece())
   const [nextPiece, setNextPiece] = useState<Piece>(() => spawnRandomPiece())
 
+  const dialogRef = useRef<HTMLDivElement>(null)
+const [scale, setScale] = useState(1)
+
   // Level otomatis dari skor (ambil yang lebih besar dibanding level dari lines)
   const scoreLevel = useMemo(
     () => Math.min(MAX_LEVEL, Math.floor(score / SCORE_LEVEL_STEP) + 1),
@@ -120,24 +123,30 @@ export default function Tetris() {
 
   // Keyboard (izinkan P/R/Escape saat pause)
   useEffect(() => {
-    if (!open) return
-    const onKey = (e: KeyboardEvent) => {
-      if (!running && !['Escape','p','P','r','R'].includes(e.key)) return
-      if (['ArrowLeft', 'ArrowRight', 'ArrowDown', ' '].includes(e.key)) e.preventDefault()
-      switch (e.key) {
-        case 'ArrowLeft':  move(-1); break
-        case 'ArrowRight': move(1); break
-        case 'ArrowDown':  softDrop(); break
-        case 'ArrowUp':    rotatePiece(1); break
-        case ' ':          hardDrop(); break
-        case 'p': case 'P': setRunning(v => !v); break
-        case 'r': case 'R': resetGame(); break
-        case 'Escape': setRunning(false); setOpen(false); break
-      }
-    }
-    window.addEventListener('keydown', onKey, { passive: false })
-    return () => window.removeEventListener('keydown', onKey)
-  }, [open, running, board, piece])
+  if (!open) return
+
+  const updateScale = () => {
+    const el = dialogRef.current
+    if (!el) return
+
+    // reset sementara supaya dapat ukuran natural
+    const prev = el.style.transform
+    el.style.transform = 'scale(1)'
+    const rect = el.getBoundingClientRect()
+    el.style.transform = prev
+
+    const margin = 16 // margin aman kiri/kanan/atas/bawah
+    const availW = window.innerWidth - margin * 2
+    const availH = window.innerHeight - margin * 2
+
+    const s = Math.min(1, Math.min(availW / rect.width, availH / rect.height))
+    setScale(s)
+  }
+
+  updateScale()
+  window.addEventListener('resize', updateScale)
+  return () => window.removeEventListener('resize', updateScale)
+}, [open])
 
   // Draw
   useEffect(() => { drawAll() }, [board, piece, open, nextPiece])
@@ -316,7 +325,14 @@ export default function Tetris() {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center">
       <div className="absolute inset-0 bg-black/60" onClick={() => { setRunning(false); setOpen(false) }} />
-      <div className="relative mx-4 w-full max-w-3xl rounded-2xl border border-white/10 bg-[#1a111b] p-4 shadow-2xl">
+      <div
+  ref={dialogRef}                                         // <-- tambahkan ref
+  className="relative mx-4 w-full max-w-3xl rounded-2xl border border-white/10 bg-[#1a111b] p-4 shadow-2xl"
+  style={{
+    transform: `scale(${scale})`,                         // <-- scale responsif
+    transformOrigin: 'center center',                     // <-- tetap center
+  }}
+>
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-lg font-bold text-white tracking-wide">Tetris</h3>
           <div className="flex items-center gap-2">
@@ -344,7 +360,7 @@ export default function Tetris() {
           </div>
         </div>
 
-        <div className="grid grid-cols-[auto_160px] gap-4 md:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-[auto_160px] gap-4 md:gap-6">
           <div className="rounded-xl border border-white/10 bg-black/40 p-2">
             <canvas ref={canvasRef} width={COLS * BLOCK} height={ROWS * BLOCK} className="block rounded-lg" />
           </div>
