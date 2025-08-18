@@ -216,7 +216,7 @@ export default function ParticleTypingBackground() {
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 0,                 // di belakang konten
+        zIndex: -1,                 // di belakang konten
         width: '100vw',
         height: 'calc(var(--vh, 1vh) * 100)', // 100svh fallback
         background: 'radial-gradient(ellipse at 40% 25%, #340e1e 0%, #221016 100%)',
