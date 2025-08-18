@@ -54,12 +54,12 @@ export default function Hero() {
       }}
     >
       {/* Background 3D: dimatikan di layar kecil untuk performa */}
-      <div className="absolute inset-0 hidden sm:block">
+      <div className="absolute inset-0">
         <ParticleTypingBackground />
       </div>
 
       {/* Overlay halus biar teks kontras */}
-      <div className="pointer-events-none absolute inset-0 bg-slate-950/40 sm:bg-slate-950/30 backdrop-blur-[1px]" aria-hidden />
+      <div className="pointer-events-none absolute inset-0 bg-slate-950/25 sm:bg-slate-950/30 backdrop-blur-[1px]" aria-hidden />
 
       {/* Content */}
       <div className="relative z-10 text-center space-y-6 sm:space-y-8 max-w-4xl mx-auto">
