@@ -223,7 +223,7 @@ const MusicPlayer: React.FC = () => {
                 `}
                 style={{
                     boxShadow: "0 2px 24px #000c",
-                    touchAction: 'pan-y',  
+                    touchAction: 'pan-y',
                     // sisakan "sliver" saat tertutup supaya bisa di-drag buka
                     right: showPanel ? 0 : `-${panelOffset - 4}px`,
                     cursor: 'grab'
@@ -357,35 +357,40 @@ const MusicPlayer: React.FC = () => {
                         </div>
 
                         {/* Playlist panel */}
+                        {/* Playlist panel (mobile: collapsible inside the card, not overlay) */}
                         <div
                             className={`
-                                fixed md:static left-0 bottom-0 w-full md:w-auto
-                                z-40 transition-all duration-500 ease-in-out
-                                bg-[#1e1020] md:bg-transparent 
-                                shadow-2xl md:shadow-none
-                                rounded-t-2xl md:rounded-2xl
-                                border-t border-white/10 md:border-none
-                                overflow-hidden
-                                ${showPlaylist ? 'max-h-96 opacity-100 visible' : 'max-h-0 opacity-0 invisible'}
-                            `}
-                            style={{
-                                margin: showPlaylist ? "0 auto" : "",
-                                boxShadow: showPlaylist ? "0 -2px 32px 0 #e71d36cc" : "",
-                                padding: showPlaylist ? "20px 0 0" : "0",
-                            }}
+    w-full md:w-auto
+    transition-all duration-400 ease-in-out
+    bg-[#1e1020] md:bg-transparent
+    rounded-t-2xl md:rounded-2xl
+    border-t border-white/10 md:border-none
+    overflow-hidden
+    ${showPlaylist ? 'max-h-[45vh] opacity-100 visible' : 'max-h-0 opacity-0 invisible'}
+  `}
                         >
-                            <h3 className="font-bold mb-2 text-base text-white/80 text-center">Playlist</h3>
-                            <ul className="space-y-1 px-4 pb-4">
+                            {/* Sticky header inside playlist with close button */}
+                            <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-2 bg-[#1e1020]/95 md:bg-transparent border-b border-white/10 md:border-0">
+                                <h3 className="font-bold text-base text-white/80">Playlist</h3>
+                                <button
+                                    onClick={() => setShowPlaylist(false)}
+                                    className="text-xs px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20"
+                                >
+                                    Close
+                                </button>
+                            </div>
+
+                            {/* Scrollable list; keep controls above visible */}
+                            <ul className="space-y-1 px-4 pb-[max(env(safe-area-inset-bottom),16px)] overflow-y-auto max-h-[calc(45vh-44px)]">
                                 {playlist.map((song, index) => (
                                     <li
                                         key={index}
                                         className={`
-                                            cursor-pointer flex items-center gap-2 px-2 py-2 rounded-xl
-                                            transition
-                                            ${index === currentIndex
+          cursor-pointer flex items-center gap-2 px-2 py-2 rounded-xl transition
+          ${index === currentIndex
                                                 ? 'bg-gradient-to-r from-[#e71d36]/80 to-[#4267b2]/90 text-white font-bold shadow'
                                                 : 'hover:bg-white/10 text-gray-200 font-semibold'}
-                                        `}
+        `}
                                         onClick={() => handleSelect(index)}
                                     >
                                         <span className="text-rose-400">🎵</span> {song.title}
