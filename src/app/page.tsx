@@ -3,6 +3,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AboutSection from "@/components/about";
+import Skills from "@/components/skills"
 import Projects from "@/components/projects";
 import Testimony from "@/components/Testimony";
 import ContactUs from "@/components/contactus";
@@ -20,6 +21,7 @@ export default function Home() {
         >
           <div className="mx-auto max-w-none lg:max-w-screen-2xl">  {/* ← mobile full width */}
             <AboutSection />
+            <Skills />
             <Projects />
             <Testimony />
             <ContactUs />
