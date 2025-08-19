@@ -8,6 +8,21 @@
   max-width: 100%;
   overflow-x: hidden;
 }
+html {
+  scroll-behavior: smooth;
+}
+
+/* Scrollbar modern */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #1b1b1b;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg,#e71d36,#4267b2);
+  border-radius: 8px;
+}
 
 @theme inline {
   --color-background: var(--background);
