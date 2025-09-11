@@ -402,7 +402,7 @@ export default function Projects() {
                       )}
                     </div>
                   </div>
-                  <p className="text-slate-400 text-sm leading-relaxed line-clamp-2">{project.description}</p>
+                  <p className="text-slate-400 text-[12px] sm:text-sm md:text-[15px] leading-relaxed break-words">{project.description}</p>
                   <div className="flex flex-wrap gap-2 pt-1">
                     {project.tech.map((tech) => (
                       <span key={tech} className="px-3 py-1 text-xs bg-slate-800 text-slate-300 rounded-full">
