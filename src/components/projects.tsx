@@ -166,55 +166,65 @@ export default function Projects() {
     [activeCat, projects],
   )
 
-  // existing scroll animations + small filter re-animation
+  // desktop-only scroll animations to avoid mobile stuck opacity
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        titleRef.current,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          scrollTrigger: {
-            trigger: titleRef.current,
-            start: "top 80%",
-          },
-        },
-      )
+      ScrollTrigger.matchMedia({
+        "(min-width: 768px)": () => {
+          gsap.fromTo(
+            titleRef.current,
+            { opacity: 0, y: 50 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 1,
+              scrollTrigger: {
+                trigger: titleRef.current,
+                start: "top 85%",
+                once: true,
+              },
+            },
+          )
 
-      gsap.fromTo(
-        ".project-card",
-        { opacity: 0, y: 100, scale: 0.8 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.8,
-          stagger: 0.2,
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top 80%",
-          },
+          gsap.fromTo(
+            ".project-card",
+            { opacity: 0, y: 100, scale: 0.9 },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.8,
+              stagger: 0.15,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: containerRef.current,
+                start: "top 85%",
+                once: true,
+              },
+            },
+          )
         },
-      )
+      })
     })
     return () => ctx.revert()
   }, [])
 
-  // re-animate cards when category changes
+  // re-animate cards when category changes (desktop only)
   useEffect(() => {
-    gsap.fromTo(
-      ".project-card",
-      { opacity: 0, y: 24, scale: 0.98 },
-      { opacity: 1, y: 0, scale: 1, duration: 0.45, stagger: 0.08, ease: "power2.out" },
-    )
+    const mql = typeof window !== "undefined" ? window.matchMedia("(min-width: 768px)") : null
+    if (mql?.matches) {
+      gsap.fromTo(
+        ".project-card",
+        { opacity: 0, y: 24, scale: 0.98 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.45, stagger: 0.08, ease: "power2.out" },
+      )
+    }
   }, [activeCat])
 
   // rely on CSS grid stretching; no JS equalizer to avoid stale heights
 
   return (
-    <section id="projects" ref={sectionRef} className="py-8 px-6 overflow-hidden">
+    <section id="projects" ref={sectionRef} className="relative py-8 px-6 overflow-hidden">
       <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-gradient-to-br from-[#b91c1c] to-[#4c0000] animate-blob opacity-20 blur-3xl rounded-full z-0" />
       <div className="w-full max-w-screen-2xl mx-auto relative z-10">
         <h2 ref={titleRef} className="text-4xl md:text-5xl font-light text-center mb-10 md:mb-16">
