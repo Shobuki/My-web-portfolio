@@ -74,6 +74,7 @@ export default function Projects() {
     {
       id: 1,
       title: "Asianet Workforce Management System",
+      Link:"https://swfm.asianet.co.id/",
       description: "This project is an Asianet Work Force Management (WFM) system designed to manage work orders, users, teams, sites, services, status/activities, file uploads/media, analytics, and exports. The application connects to MySQL and Redis, uses Asynq for background jobs, integrates with object storage (S3/MinIO), leverages Gotenberg for PDF generation, and connects with internal microservices to support internal operational needs.",
       images: [
         "/images/portfolio/asianet/asianet.png",
