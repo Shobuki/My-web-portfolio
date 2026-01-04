@@ -332,7 +332,7 @@ export default function Projects() {
                                   height={800}
                                   sizes="100vw"
                                   loading="lazy"
-                                  className="max-h-full max-w-full object-contain"
+                                  className="max-h-full max-w-full object-contain object-center"
                                 />
                               </button>
                             </SwiperSlide>
@@ -354,7 +354,7 @@ export default function Projects() {
                             height={800}
                             sizes="100vw"
                             loading="lazy"
-                            className="max-h-full max-w-full object-contain"
+                            className="max-h-full max-w-full object-contain object-center"
                           />
                         </div>
                       </button>
@@ -373,7 +373,7 @@ export default function Projects() {
                                   alt={project.title}
                                   width={1200}
                                   height={800}
-                                  className="object-contain max-h-full max-w-full mx-auto my-auto"
+                                  className="object-contain object-center max-h-full max-w-full mx-auto my-auto"
                                 />
                               </div>
                             </Zoom>
@@ -388,7 +388,7 @@ export default function Projects() {
                             alt={project.title}
                             fill
                             sizes="(max-width: 768px) 100vw, 33vw"
-                            className="object-contain max-h-full max-w-full mx-auto my-auto"
+                            className="object-contain object-center max-h-full max-w-full mx-auto my-auto"
                           />
                         </div>
                       </Zoom>
