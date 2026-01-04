@@ -79,7 +79,7 @@ export default function Projects() {
         "/images/portfolio/asianet/asianet.png",
         "/images/portfolio/asianet/asianet2.png",
         "/images/portfolio/asianet/asianet3.png",
-        "/images/portfolio/asianet/asianet4.png",
+        "/images/portfolio/asianet/asianet4.jpeg",
         "/images/portfolio/asianet/asianet5.jpeg",
         "/images/portfolio/asianet/asianet6.jpeg",
         "/images/portfolio/asianet/asianet7.jpeg",
