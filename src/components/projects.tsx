@@ -73,6 +73,23 @@ export default function Projects() {
   const projects: Project[] = [
     {
       id: 1,
+      title: "Asianet Workforce Management System",
+      description: "This project is an Asianet Work Force Management (WFM) system designed to manage work orders, users, teams, sites, services, status/activities, file uploads/media, analytics, and exports. The application connects to MySQL and Redis, uses Asynq for background jobs, integrates with object storage (S3/MinIO), leverages Gotenberg for PDF generation, and connects with internal microservices to support internal operational needs.",
+      images: [
+        "/images/portfolio/asianet/asianet.png",
+        "/images/portfolio/asianet/asianet2.png",
+        "/images/portfolio/asianet/asianet3.png",
+        "/images/portfolio/asianet/asianet4.png",
+        "/images/portfolio/asianet/asianet5.png",
+        "/images/portfolio/asianet/asianet6.png",
+        "/images/portfolio/asianet/asianet7.png",
+      ],
+      tech: ["Golang","MySQL","Redis", "Next.js", "Flutter","Docker","AWS"],
+      color: "from-blue-500 to-cyan-500",
+      category: "Web Apps",
+    },
+    {
+      id: 2,
       title: "Sunflex Store User Website",
       description: "Sunway Trek Masindo website for business",
       images: ["/images/portfolio/sunflexuser.png", "/images/portfolio/sunflexuser2.png"],
@@ -81,7 +98,7 @@ export default function Projects() {
       category: "Web Apps",
     },
     {
-      id: 2,
+      id: 3,
       title: "Sunflex Store Admin Dashboard",
       description:
         "Admin dashboard to manage Sunflex Store with transaction approval and automated email sending",
@@ -91,7 +108,7 @@ export default function Projects() {
       category: "Web Apps",
     },
      {
-      id: 3,
+      id: 4,
       title: "Travel landing page",
       Link:"https://travelikaa.vercel.app/",
       description:
@@ -102,7 +119,7 @@ export default function Projects() {
       category: "Web Apps",
     },
      {
-      id: 4,
+      id: 5,
       title: "Profile landing page",
       Link:"https://shobuki.vercel.app/",
       description:
@@ -113,7 +130,7 @@ export default function Projects() {
       category: "Web Apps",
     },
     {
-      id: 5,
+      id: 6,
       title: "WhatsApp Bot Automation",
       description:
         "Automation for WhatsApp messages with mini-games and experiments integrating AI models (IN DEVELOPMENT)",
@@ -128,7 +145,7 @@ export default function Projects() {
       category: "Automation & Bots",
     },
     {
-      id: 6,
+      id: 7,
       title: "Healthy Website Calculator",
       description:
         "AI experiment to calculate healthy food + recipes using KNN; integrated with Mistral (Ollama)",
@@ -143,7 +160,7 @@ export default function Projects() {
       category: "AI / ML",
     },
     {
-      id: 7,
+      id: 8,
       title: "Instagram & Twitter Data Scraper",
       description: "Scrape public data from Instagram and Twitter using Node.js + Puppeteer",
       images: ["/images/portfolio/datascraping/data1.png", "/images/portfolio/datascraping/data2.png"],
@@ -152,7 +169,7 @@ export default function Projects() {
       category: "Data & Scraping",
     },
     {
-      id: 8,
+      id: 9,
       title: "My Petz App",
       description: "Android app for pet lovers",
       image: "/images/portfolio/mypetz.jpeg",
@@ -161,7 +178,7 @@ export default function Projects() {
       category: "Mobile Apps",
     },
     {
-      id: 9,
+      id: 10,
       title: "Canggihku App",
       description: "Simple POS Android application",
       image: "/images/portfolio/canggihku.jpeg",
@@ -170,7 +187,7 @@ export default function Projects() {
       category: "Mobile Apps",
     },
     {
-      id: 10,
+      id: 11,
       title: "Meme Playground",
       description: "A fun little website for memes",
       image: "/images/portfolio/meme.png",
