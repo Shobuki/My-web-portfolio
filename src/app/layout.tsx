@@ -1,9 +1,6 @@
 import "./globals.css";
-import 'aplayer/dist/APlayer.min.css';
 import { Playfair_Display, Raleway } from 'next/font/google'
-import MusicPlayer from '@/components/MusicPlayer';
-import Tetris from '@/components/tetris';
-import LenisProvider from '@/components/LenisProvider'
+import ClientEnhancements from "@/components/ClientEnhancements";
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -27,12 +24,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${playfair.variable} ${raleway.variable}`}>
       <body className="bg-primary-black text-text-primary font-raleway overflow-x-hidden">
-        {/* Pasang lebih awal agar window.openTetris cepat siap */}
-        <Tetris />
-      <LenisProvider />
+        <ClientEnhancements />
         {children}
-
-        <MusicPlayer />
       </body>
     </html>
   )

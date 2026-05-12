@@ -1,17 +1,23 @@
 'use client'
 
-import { useEffect, useRef } from "react"
+import dynamic from "next/dynamic"
+import { useEffect, useRef, useState } from "react"
 import { gsap } from "gsap"
 import { Button } from "@/components/ui/button"
 import { Code } from "lucide-react"
-import ParticleTypingBackground from "@/components/ParticleTypingBackground"
 import Image from "next/image"
+
+const ParticleTypingBackground = dynamic(
+  () => import("@/components/ParticleTypingBackground"),
+  { ssr: false }
+)
 
 export default function Hero() {
   const heroRef = useRef<HTMLDivElement>(null)
   const headlineRef = useRef<HTMLHeadingElement>(null)
   const subtitleRef = useRef<HTMLParagraphElement>(null)
   const ctaRef = useRef<HTMLDivElement>(null)
+  const [showBackground, setShowBackground] = useState(false)
 
   useEffect(() => {
     const tl = gsap.timeline({ delay: 0.6 })
@@ -35,6 +41,19 @@ export default function Hero() {
     return () => { tl.kill() }
   }, [])
 
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    if (window.matchMedia("(max-width: 767px)").matches) return
+
+    if ("requestIdleCallback" in window) {
+      const idleId = window.requestIdleCallback(() => setShowBackground(true), { timeout: 1200 })
+      return () => window.cancelIdleCallback(idleId)
+    }
+
+    const timeoutId = window.setTimeout(() => setShowBackground(true), 600)
+    return () => window.clearTimeout(timeoutId)
+  }, [])
+
   return (
     <section
       id="hero"
@@ -55,7 +74,7 @@ export default function Hero() {
     >
       {/* Background 3D: dimatikan di layar kecil untuk performa */}
       <div className="absolute inset-0">
-        <ParticleTypingBackground />
+        {showBackground ? <ParticleTypingBackground /> : null}
       </div>
 
       {/* Overlay halus biar teks kontras */}
