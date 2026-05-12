@@ -3,6 +3,10 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useRef, useEffect, useMemo, useState } from 'react';
 
+type Vec3Tuple = [number, number, number];
+type MarginConfig = { left: number; right: number; top: number; bottom: number };
+type ViewportAnchor = "free" | "top-left";
+
 function useTextPoints(text: string, fontSize = 80) {
   const [points, setPoints] = useState<THREE.Vector3[]>([]);
   useEffect(() => {
@@ -50,24 +54,34 @@ function ParticlesText({
   stickToMobileViewport = true,
   mobileMargin = { left: 16, top: 80 }, // px dari tepi kiri & atas
   mobileOffsetY = 0,
+  viewportMargin = { left: 24, right: 24, top: 40, bottom: 24 },
+  viewportAnchor = "free",
 }: {
   text: string;
   typing?: boolean;
   color?: string;
   size?: number;
-  position?: [number, number, number];
+  position?: Vec3Tuple;
   fade?: number;
   animated?: boolean;
   stickToMobileViewport?: boolean;
   mobileMargin?: { left: number; top: number };
   mobileOffsetY?: number;
+  viewportMargin?: MarginConfig;
+  viewportAnchor?: ViewportAnchor;
 }) {
   // ===== Responsif berdasarkan lebar kanvas/fiber =====
   const { viewport, size: viewSize } = useThree();
   const isMobile = viewSize.width < 768;
 
   // font lebih kecil di mobile supaya muat
-  const points = useTextPoints(text, isMobile ? 58 : 80);
+  const computedFontSize = useMemo(() => {
+    if (isMobile) return 58;
+    if (viewSize.width < 1100) return 68;
+    return 80;
+  }, [isMobile, viewSize.width]);
+
+  const points = useTextPoints(text, computedFontSize);
 
   const mesh = useRef<THREE.Points>(null);
   const [showCount, setShowCount] = useState(0);
@@ -99,11 +113,17 @@ function ParticlesText({
         positions[i * 3 + 1] = p.y;
         positions[i * 3 + 2] = p.z + (Math.random() - 0.5) * 6;
       });
-      geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));  
-      geo.computeBoundingBox
+      geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geo.computeBoundingBox();
     }
     return geo;
   }, [visiblePoints]);
+
+  useEffect(() => {
+    return () => {
+      geometry.dispose();
+    };
+  }, [geometry]);
 
   useFrame(({ clock }) => {
     if (mesh.current) {
@@ -112,32 +132,62 @@ function ParticlesText({
     }
   });
 
-  // skala & posisi responsif: kecilkan & geser supaya pasti terlihat
-  const scale = isMobile ? 0.6 : 1;
-  const pos: [number, number, number] = [
-    isMobile ? position[0] * 0.55 : position[0],
-    isMobile ? position[1] * 0.70 : position[1],
-    position[2]
-  ];
+  const scale = isMobile ? 0.6 : viewSize.width < 1100 ? 0.82 : 1;
 
-  const groupPosition = useMemo<[number, number, number]>(() => {
-    if (!isMobile || !stickToMobileViewport || !geometry.boundingBox) return position as [number, number, number];
+  const groupPosition = useMemo<Vec3Tuple>(() => {
+    if (!geometry.boundingBox) return position;
 
     const bbox = geometry.boundingBox;
-    const textW = (bbox.max.x - bbox.min.x) * scale;
-    const textH = (bbox.max.y - bbox.min.y) * scale;
-
     const factor = viewport.factor || 1; // px per 1 world-unit
-    const leftMarginWU = mobileMargin.left / factor;
-    const topMarginWU  = (mobileMargin.top + mobileOffsetY) / factor;
+    const leftEdge = bbox.min.x * scale;
+    const rightEdge = bbox.max.x * scale;
+    const topEdge = bbox.max.y * scale;
+    const bottomEdge = bbox.min.y * scale;
 
-    const x = -viewport.width / 2 + textW / 2 + leftMarginWU; // nempel kiri + margin
-    const y =  viewport.height / 2 - textH / 2 - topMarginWU; // nempel atas + margin
+    const leftLimit = -viewport.width / 2 - leftEdge + viewportMargin.left / factor;
+    const rightLimit = viewport.width / 2 - rightEdge - viewportMargin.right / factor;
+    const topLimit = viewport.height / 2 - topEdge - viewportMargin.top / factor;
+    const bottomLimit = -viewport.height / 2 - bottomEdge + viewportMargin.bottom / factor;
+    const viewportLeftX = -viewport.width / 2 - leftEdge + viewportMargin.left / factor;
+    const viewportTopY = viewport.height / 2 - topEdge - viewportMargin.top / factor;
+
+    if (isMobile && stickToMobileViewport) {
+      const leftMarginWU = mobileMargin.left / factor;
+      const topMarginWU = (mobileMargin.top + mobileOffsetY) / factor;
+      const x = -viewport.width / 2 - leftEdge + leftMarginWU;
+      const y = viewport.height / 2 - topEdge - topMarginWU;
+      return [x, y, position[2]];
+    }
+
+    if (viewportAnchor === "top-left") {
+      return [viewportLeftX, viewportTopY, position[2]];
+    }
+
+    const preferredX = position[0] * scale;
+    const preferredY = position[1] * scale;
+    const x = THREE.MathUtils.clamp(preferredX, leftLimit, rightLimit);
+    const y = THREE.MathUtils.clamp(preferredY, bottomLimit, topLimit);
+
     return [x, y, position[2]];
-  }, [isMobile, stickToMobileViewport, geometry, scale, viewport, mobileMargin.left, mobileMargin.top, mobileOffsetY, position]);
+  }, [
+    geometry.boundingBox,
+    isMobile,
+    mobileMargin.left,
+    mobileMargin.top,
+    mobileOffsetY,
+    position,
+    scale,
+    stickToMobileViewport,
+    viewport,
+    viewportAnchor,
+    viewportMargin.bottom,
+    viewportMargin.left,
+    viewportMargin.right,
+    viewportMargin.top,
+  ]);
 
   return (
-    <group position={pos as any} scale={scale}>
+    <group position={groupPosition} scale={scale}>
       <points ref={mesh} geometry={geometry}>
         <pointsMaterial
           size={size * (isMobile ? 0.8 : 1)}
@@ -239,6 +289,8 @@ export default function ParticleTypingBackground() {
         fade={alfredoFade}
         animated
         mobileMargin={{ left: 16, top: 72 }}
+        viewportMargin={{ left: 28, right: 32, top: 120, bottom: 32 }}
+        viewportAnchor="top-left"
       />
       {/* Baris kode di bawahnya */}
       <ParticlesText
@@ -249,6 +301,8 @@ export default function ParticleTypingBackground() {
         position={[-240, 35, 0]}
         fade={1}
         animated={false}
+        mobileMargin={{ left: 16, top: 132 }}
+        viewportMargin={{ left: 48, right: 32, top: 132, bottom: 32 }}
       />
     </Canvas>
   );
