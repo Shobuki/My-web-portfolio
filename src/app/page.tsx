@@ -8,6 +8,7 @@ import Hero from "@/components/Hero";
 const Footer = dynamic(() => import("@/components/Footer"));
 const AboutSection = dynamic(() => import("@/components/about"));
 const Skills = dynamic(() => import("@/components/skills"));
+const Experience = dynamic(() => import("@/components/experience"));
 const Projects = dynamic(() => import("@/components/projects"));
 const Testimony = dynamic(() => import("@/components/Testimony"));
 const ContactUs = dynamic(() => import("@/components/contactus"));
@@ -74,6 +75,9 @@ export default function Home() {
             </DeferredSection>
             <DeferredSection className="min-h-[420px]">
               <Skills />
+            </DeferredSection>
+            <DeferredSection className="min-h-[420px]">
+              <Experience />
             </DeferredSection>
             <DeferredSection className="min-h-[720px]" rootMargin="350px 0px">
               <Projects />
