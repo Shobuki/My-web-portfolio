@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { SiWhatsapp } from 'react-icons/si'; // <-- 1. Impor ikon WhatsApp
 
+type ContactPayload = Record<string, FormDataEntryValue>
+
 export default function ContactUs() {
   const [submitting, setSubmitting] = useState(false)
   const [showPopup, setShowPopup] = useState(false)
@@ -15,7 +17,7 @@ export default function ContactUs() {
 
     const form = e.currentTarget
     const formData = new FormData(form)
-    const payload: Record<string, any> = Object.fromEntries(formData.entries())
+    const payload: ContactPayload = Object.fromEntries(formData.entries())
 
     try {
       const res = await fetch('https://formsubmit.co/ajax/dagonzaalfredo@gmail.com', {
@@ -34,8 +36,8 @@ export default function ContactUs() {
 
       form.reset()
       setShowPopup(true)
-    } catch (err: any) {
-      setErrorMsg('Pengiriman gagal. Silakan coba lagi.')
+    } catch (err: unknown) {
+      setErrorMsg('Pengiriman gagal. Periksa koneksi lalu coba lagi.')
       console.error(err)
     } finally {
       setSubmitting(false)
@@ -100,14 +102,17 @@ export default function ContactUs() {
                     </div>
 
                     {errorMsg && (
-                        <p className="text-sm text-primary-red">{errorMsg}</p>
+                        <div role="alert" className="flex items-center justify-between gap-3 rounded-lg border border-primary-red/40 bg-primary-red/10 px-3 py-2 text-sm text-primary">
+                            <span>{errorMsg}</span>
+                            <button type="button" onClick={() => setErrorMsg(null)} className="font-semibold underline underline-offset-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-red">Tutup</button>
+                        </div>
                     )}
 
                     <div className="text-center md:text-left pt-4">
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="rounded-full border-2 bg-primary-red px-10 py-4 text-lg font-bold uppercase tracking-wider text-white shadow-lg transition-transform duration-300 hover:scale-105 hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed"
+                            className="rounded-full border-2 border-primary-red bg-primary-red px-10 py-4 text-lg font-bold uppercase tracking-wider text-white shadow-lg transition-transform duration-300 hover:scale-105 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-primary-black active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed motion-reduce:transition-none"
                         >
                             {submitting ? 'Sending...' : 'Send Message'}
                         </button>

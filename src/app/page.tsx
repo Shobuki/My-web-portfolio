@@ -22,14 +22,34 @@ function SectionPlaceholder({ className = "" }: { className?: string }) {
   );
 }
 
+function ProjectsPlaceholder() {
+  return (
+    <div aria-hidden className="grid grid-cols-1 gap-5 py-8 sm:grid-cols-2 lg:grid-cols-3">
+      {[0, 1, 2].map((item) => (
+        <div key={item} className="overflow-hidden rounded-2xl border border-outline-variant bg-surface-high/70">
+          <div className="aspect-[16/9] animate-pulse bg-surface-card" />
+          <div className="space-y-3 p-6">
+            <div className="h-5 w-3/4 animate-pulse rounded bg-surface-card" />
+            <div className="h-3 w-full animate-pulse rounded bg-surface-card" />
+            <div className="h-3 w-2/3 animate-pulse rounded bg-surface-card" />
+            <div className="flex gap-2 pt-2"><div className="h-7 w-20 animate-pulse rounded-full bg-surface-card" /><div className="h-7 w-16 animate-pulse rounded-full bg-surface-card" /></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function DeferredSection({
   children,
   className,
   rootMargin = "250px 0px",
+  placeholder,
 }: {
   children: ReactNode;
   className?: string;
   rootMargin?: string;
+  placeholder?: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -54,7 +74,7 @@ function DeferredSection({
 
   return (
     <div ref={ref}>
-      {isVisible ? children : <SectionPlaceholder className={className} />}
+      {isVisible ? children : placeholder ?? <SectionPlaceholder className={className} />}
     </div>
   );
 }
@@ -79,7 +99,7 @@ export default function Home() {
             <DeferredSection className="min-h-[420px]">
               <Experience />
             </DeferredSection>
-            <DeferredSection className="min-h-[720px]" rootMargin="350px 0px">
+            <DeferredSection rootMargin="350px 0px" placeholder={<ProjectsPlaceholder />}>
               <Projects />
             </DeferredSection>
             <DeferredSection className="min-h-[420px]">
