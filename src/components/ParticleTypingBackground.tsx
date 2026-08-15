@@ -1,309 +1,237 @@
 'use client'
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import * as THREE from 'three';
-import { useRef, useEffect, useMemo, useState } from 'react';
 
-type Vec3Tuple = [number, number, number];
-type MarginConfig = { left: number; right: number; top: number; bottom: number };
-type ViewportAnchor = "free" | "top-left";
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import * as THREE from 'three'
+import { useEffect, useMemo, useRef } from 'react'
 
-function useTextPoints(text: string, fontSize = 80) {
-  const [points, setPoints] = useState<THREE.Vector3[]>([]);
-  useEffect(() => {
-    if (!text) { setPoints([]); return; }
-    const canvas = document.createElement('canvas');
-    // ukuran kanvas lebih fleksibel (sesuai fontSize)
-    const scale = fontSize / 80; // 80 = basis asal
-    canvas.width = Math.round(650 * scale);
-    canvas.height = Math.round(200 * scale);
-    const ctx = canvas.getContext('2d')!;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = `bold ${fontSize}px monospace`;
-    ctx.textBaseline = 'top';
-    ctx.fillStyle = '#fff';
-    ctx.fillText(text, 20 * scale, 55 * scale);
+type Glyph = '{}' | '<>' | '0' | '1'
+type Layer = 0 | 1 | 2
 
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const arr: THREE.Vector3[] = [];
-    const density = Math.max(3, Math.round(4 * scale)); // density ikut skala
-    for (let y = 0; y < canvas.height; y += density) {
-      for (let x = 0; x < canvas.width; x += density) {
-        const i = (y * canvas.width + x) * 4;
-        if (imageData.data[i + 3] > 128) {
-          arr.push(new THREE.Vector3(
-            x - canvas.width / 2,
-            canvas.height / 2 - y,
-            0
-          ));
-        }
-      }
-    }
-    setPoints(arr);
-  }, [text, fontSize]);
-  return points;
+type RainGlyph = {
+  glyph: Glyph
+  layer: Layer
+  x: number
+  y: number
+  speed: number
+  drift: number
+  phase: number
+  pushX: number
+  pushY: number
 }
 
-function ParticlesText({
-  text,
-  typing,
-  color = "#f2dedf",
-  size = 4.5,
-  position = [0, 0, 0],
-  fade = 1,
-  animated = true,
-  stickToMobileViewport = true,
-  mobileMargin = { left: 16, top: 80 }, // px dari tepi kiri & atas
-  mobileOffsetY = 0,
-  viewportMargin = { left: 24, right: 24, top: 40, bottom: 24 },
-  viewportAnchor = "free",
-}: {
-  text: string;
-  typing?: boolean;
-  color?: string;
-  size?: number;
-  position?: Vec3Tuple;
-  fade?: number;
-  animated?: boolean;
-  stickToMobileViewport?: boolean;
-  mobileMargin?: { left: number; top: number };
-  mobileOffsetY?: number;
-  viewportMargin?: MarginConfig;
-  viewportAnchor?: ViewportAnchor;
-}) {
-  // ===== Responsif berdasarkan lebar kanvas/fiber =====
-  const { viewport, size: viewSize } = useThree();
-  const isMobile = viewSize.width < 768;
+const GLYPHS: Glyph[] = ['{}', '<>', '0', '1']
+const LAYERS = [
+  { z: -2.5, scale: 0.44, opacity: 0.16, speed: 0.18 },
+  { z: -0.5, scale: 0.6, opacity: 0.28, speed: 0.28 },
+  { z: 1.2, scale: 0.78, opacity: 0.42, speed: 0.38 },
+] as const
 
-  // font lebih kecil di mobile supaya muat
-  const computedFontSize = useMemo(() => {
-    if (isMobile) return 58;
-    if (viewSize.width < 1100) return 68;
-    return 80;
-  }, [isMobile, viewSize.width]);
+function createGlyphTexture(glyph: Glyph) {
+  const canvas = document.createElement('canvas')
+  canvas.width = 256
+  canvas.height = 256
 
-  const points = useTextPoints(text, computedFontSize);
+  const context = canvas.getContext('2d')
+  if (!context) return new THREE.Texture()
 
-  const mesh = useRef<THREE.Points>(null);
-  const [showCount, setShowCount] = useState(0);
+  context.clearRect(0, 0, canvas.width, canvas.height)
+  context.fillStyle = '#ffb3ad'
+  context.font = '700 104px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+  context.textAlign = 'center'
+  context.textBaseline = 'middle'
+  context.fillText(glyph, canvas.width / 2, canvas.height / 2)
+
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.colorSpace = THREE.SRGBColorSpace
+  texture.minFilter = THREE.LinearFilter
+  texture.magFilter = THREE.LinearFilter
+  texture.generateMipmaps = false
+  return texture
+}
+
+function AnimationDriver() {
+  const invalidate = useThree((state) => state.invalidate)
 
   useEffect(() => {
-    if (!typing || !animated) {
-      setShowCount(points.length);
-      return;
-    }
-    setShowCount(0);
-    if (!points.length) return;
-    let i = 0;
-    const step = Math.max(2, Math.floor(points.length / Math.max(1, text.length * 7)));
-    const interval = setInterval(() => {
-      i += step;
-      setShowCount(Math.min(i, points.length));
-      if (i >= points.length) clearInterval(interval);
-    }, 22);
-    return () => clearInterval(interval);
-  }, [points, text, typing, animated]);
+    let frameId = 0
+    let previous = 0
+    let active = !document.hidden
 
-  const visiblePoints = useMemo(() => points.slice(0, showCount), [points, showCount]);
-  const geometry = useMemo(() => {
-    const geo = new THREE.BufferGeometry();
-    if (visiblePoints.length > 0) {
-      const positions = new Float32Array(visiblePoints.length * 3);
-      visiblePoints.forEach((p, i) => {
-        positions[i * 3] = p.x;
-        positions[i * 3 + 1] = p.y;
-        positions[i * 3 + 2] = p.z + (Math.random() - 0.5) * 6;
-      });
-      geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      geo.computeBoundingBox();
+    const onVisibilityChange = () => {
+      active = !document.hidden
     }
-    return geo;
-  }, [visiblePoints]);
 
-  useEffect(() => {
+    const tick = (time: number) => {
+      if (active && time - previous >= 33) {
+        previous = time
+        invalidate()
+      }
+      frameId = requestAnimationFrame(tick)
+    }
+
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    frameId = requestAnimationFrame(tick)
+
     return () => {
-      geometry.dispose();
-    };
-  }, [geometry]);
-
-  useFrame(({ clock }) => {
-    if (mesh.current) {
-      mesh.current.rotation.y = Math.sin(clock.getElapsedTime() / 5) * 0.09;
-      mesh.current.rotation.x = Math.cos(clock.getElapsedTime() / 5) * 0.04;
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+      cancelAnimationFrame(frameId)
     }
-  });
+  }, [invalidate])
 
-  const scale = isMobile ? 0.6 : viewSize.width < 1100 ? 0.82 : 1;
+  return null
+}
 
-  const groupPosition = useMemo<Vec3Tuple>(() => {
-    if (!geometry.boundingBox) return position;
+function CodeGlyphLayer({
+  glyphs,
+  texture,
+  opacity,
+}: {
+  glyphs: RainGlyph[]
+  texture: THREE.Texture
+  opacity: number
+}) {
+  const meshRef = useRef<THREE.InstancedMesh>(null)
+  const pointerRef = useRef(new THREE.Vector2(999, 999))
+  const viewportRef = useRef({ width: 1, height: 1 })
+  const matrix = useMemo(() => new THREE.Matrix4(), [])
+  const position = useMemo(() => new THREE.Vector3(), [])
+  const scale = useMemo(() => new THREE.Vector3(), [])
+  const quaternion = useMemo(() => new THREE.Quaternion(), [])
+  const { gl, viewport } = useThree()
 
-    const bbox = geometry.boundingBox;
-    const factor = viewport.factor || 1; // px per 1 world-unit
-    const leftEdge = bbox.min.x * scale;
-    const rightEdge = bbox.max.x * scale;
-    const topEdge = bbox.max.y * scale;
-    const bottomEdge = bbox.min.y * scale;
+  useEffect(() => {
+    const onPointerMove = (event: PointerEvent) => {
+      const rect = gl.domElement.getBoundingClientRect()
+      const inside =
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom
 
-    const leftLimit = -viewport.width / 2 - leftEdge + viewportMargin.left / factor;
-    const rightLimit = viewport.width / 2 - rightEdge - viewportMargin.right / factor;
-    const topLimit = viewport.height / 2 - topEdge - viewportMargin.top / factor;
-    const bottomLimit = -viewport.height / 2 - bottomEdge + viewportMargin.bottom / factor;
-    const viewportLeftX = -viewport.width / 2 - leftEdge + viewportMargin.left / factor;
-    const viewportTopY = viewport.height / 2 - topEdge - viewportMargin.top / factor;
+      if (!inside) {
+        pointerRef.current.set(999, 999)
+        return
+      }
 
-    if (isMobile && stickToMobileViewport) {
-      const leftMarginWU = mobileMargin.left / factor;
-      const topMarginWU = (mobileMargin.top + mobileOffsetY) / factor;
-      const x = -viewport.width / 2 - leftEdge + leftMarginWU;
-      const y = viewport.height / 2 - topEdge - topMarginWU;
-      return [x, y, position[2]];
+      const x = (event.clientX - rect.left) / rect.width
+      const y = (event.clientY - rect.top) / rect.height
+      pointerRef.current.set(
+        (x - 0.5) * viewportRef.current.width,
+        (0.5 - y) * viewportRef.current.height,
+      )
     }
 
-    if (viewportAnchor === "top-left") {
-      return [viewportLeftX, viewportTopY, position[2]];
-    }
+    window.addEventListener('pointermove', onPointerMove, { passive: true })
+    return () => window.removeEventListener('pointermove', onPointerMove)
+  }, [gl])
 
-    const preferredX = position[0] * scale;
-    const preferredY = position[1] * scale;
-    const x = THREE.MathUtils.clamp(preferredX, leftLimit, rightLimit);
-    const y = THREE.MathUtils.clamp(preferredY, bottomLimit, topLimit);
+  useFrame(({ clock }, delta) => {
+    const mesh = meshRef.current
+    if (!mesh) return
 
-    return [x, y, position[2]];
-  }, [
-    geometry.boundingBox,
-    isMobile,
-    mobileMargin.left,
-    mobileMargin.top,
-    mobileOffsetY,
-    position,
-    scale,
-    stickToMobileViewport,
-    viewport,
-    viewportAnchor,
-    viewportMargin.bottom,
-    viewportMargin.left,
-    viewportMargin.right,
-    viewportMargin.top,
-  ]);
+    viewportRef.current = viewport
+    const halfHeight = viewport.height / 2
+    const span = viewport.height + 2
+    const elapsed = clock.getElapsedTime()
+
+    glyphs.forEach((glyph, index) => {
+      const layer = LAYERS[glyph.layer]
+      const y = ((((glyph.y - elapsed * glyph.speed) + halfHeight + 1) % span) + span) % span - halfHeight - 1
+      const x = glyph.x + Math.sin(elapsed * 0.35 + glyph.phase) * glyph.drift
+      const distance = Math.hypot(x - pointerRef.current.x, y - pointerRef.current.y)
+      const radius = 1.35
+      const force = distance < radius ? ((radius - distance) / radius) ** 2 : 0
+      const directionX = distance ? (x - pointerRef.current.x) / distance : 0
+      const directionY = distance ? (y - pointerRef.current.y) / distance : 0
+      const ease = 1 - Math.exp(-7 * delta)
+
+      glyph.pushX += (directionX * force * 0.8 - glyph.pushX) * ease
+      glyph.pushY += (directionY * force * 0.45 - glyph.pushY) * ease
+
+      position.set(x + glyph.pushX, y + glyph.pushY, layer.z)
+      scale.setScalar(layer.scale)
+      matrix.compose(position, quaternion, scale)
+      mesh.setMatrixAt(index, matrix)
+    })
+
+    mesh.instanceMatrix.needsUpdate = true
+  })
 
   return (
-    <group position={groupPosition} scale={scale}>
-      <points ref={mesh} geometry={geometry}>
-        <pointsMaterial
-          size={size * (isMobile ? 0.8 : 1)}
-          color={color}
-          transparent
-          opacity={0.93 * fade}
-          sizeAttenuation
-          depthWrite={false}
-        />
-      </points>
-    </group>
-  );
+    <instancedMesh ref={meshRef} args={[undefined, undefined, glyphs.length]} frustumCulled={false}>
+      <planeGeometry args={[1, 1]} />
+      <meshBasicMaterial map={texture} transparent opacity={opacity} depthWrite={false} />
+    </instancedMesh>
+  )
 }
 
-const TYPING_TEXT = 'print("world")';
-const ALFREDO = 'Alfredo';
+function CodeRain() {
+  const textures = useMemo(
+    () => Object.fromEntries(GLYPHS.map((glyph) => [glyph, createGlyphTexture(glyph)])) as Record<Glyph, THREE.Texture>,
+    [],
+  )
+  const glyphs = useMemo<RainGlyph[]>(() => {
+    const count = window.innerWidth < 1100 ? 40 : 64
+
+    return Array.from({ length: count }, (_, index) => {
+      const layer = (index % LAYERS.length) as Layer
+      return {
+        glyph: GLYPHS[index % GLYPHS.length],
+        layer,
+        x: (Math.random() - 0.5) * 15,
+        y: (Math.random() - 0.5) * 12,
+        speed: LAYERS[layer].speed * (0.7 + Math.random() * 0.6),
+        drift: 0.06 + Math.random() * 0.14,
+        phase: Math.random() * Math.PI * 2,
+        pushX: 0,
+        pushY: 0,
+      }
+    })
+  }, [])
+  const groups = useMemo(
+    () => GLYPHS.flatMap((glyph) => LAYERS.map((_, layer) => ({
+      glyph,
+      layer: layer as Layer,
+      glyphs: glyphs.filter((item) => item.glyph === glyph && item.layer === layer),
+    }))),
+    [glyphs],
+  )
+
+  useEffect(() => () => Object.values(textures).forEach((texture) => texture.dispose()), [textures])
+
+  return (
+    <>
+      <AnimationDriver />
+      {groups.map(({ glyph, layer, glyphs: items }) => items.length > 0 && (
+        <CodeGlyphLayer
+          key={`${glyph}-${layer}`}
+          glyphs={items}
+          texture={textures[glyph]}
+          opacity={LAYERS[layer].opacity}
+        />
+      ))}
+    </>
+  )
+}
 
 export default function ParticleTypingBackground() {
-  // Fix 100vh di mobile: set CSS var --vh
-  useEffect(() => {
-    const setVH = () => {
-      const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty('--vh', `${vh}px`);
-    };
-    setVH();
-    window.addEventListener('resize', setVH);
-    return () => window.removeEventListener('resize', setVH);
-  }, []);
-
-  // Alfredo looping anim
-  const [alfredoFade, setAlfredoFade] = useState(1);
-  useEffect(() => {
-    let visible = true;
-    setAlfredoFade(1);
-    let timeout: ReturnType<typeof setTimeout>;
-    const loop = () => {
-      setAlfredoFade(visible ? 1 : 0.08);
-      visible = !visible;
-      timeout = setTimeout(loop, visible ? 2200 : 580);
-    };
-    loop();
-    return () => clearTimeout(timeout);
-  }, []);
-
-  // Typing logic
-  const [typedIndex, setTypedIndex] = useState(0);
-  const [showCursor, setShowCursor] = useState(true);
-
-  useEffect(() => {
-    const interval = setInterval(() => setShowCursor(v => !v), 500);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Backspace') return;
-      setTypedIndex(idx => (idx < TYPING_TEXT.length ? idx + 1 : idx));
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, []);
-
-  useEffect(() => {
-    if (typedIndex >= TYPING_TEXT.length) {
-      const t = setTimeout(() => setTypedIndex(0), 1700);
-      return () => clearTimeout(t);
-    }
-  }, [typedIndex]);
-
-  const displayTyping =
-    TYPING_TEXT.slice(0, typedIndex) + (typedIndex < TYPING_TEXT.length && showCursor ? '|' : '');
-
   return (
     <Canvas
-      camera={{ position: [0, 0, 350], fov: 75 }}
+      camera={{ position: [0, 0, 8], fov: 55 }}
+      frameloop="demand"
+      dpr={[1, 1.5]}
+      gl={{ antialias: false, alpha: true, powerPreference: 'low-power' }}
       style={{
         position: 'absolute',
         inset: 0,
-        zIndex: 0,                  // di atas background hero, di bawah overlay/konten
+        zIndex: 0,
         width: '100%',
         height: '100%',
-        background: 'radial-gradient(ellipse at 40% 25%, #4b171a 0%, #150c0d 100%)',
-        pointerEvents: 'none',      // jangan blok scroll/klik
+        pointerEvents: 'none',
       }}
-      gl={{
-        antialias: true,
-        alpha: true,
-        powerPreference: 'high-performance',
-      }}
-      dpr={[1, 2]}                  // batasi DPR untuk device high-DPI
+      aria-hidden
     >
-      {/* Judul kiri-atas */}
-      <ParticlesText
-        text={ALFREDO}
-        typing
-        color="#f2dedf"
-        size={10}
-        position={[-260, 100, 0]}
-        fade={alfredoFade}
-        animated
-        mobileMargin={{ left: 16, top: 72 }}
-        viewportMargin={{ left: 28, right: 32, top: 120, bottom: 32 }}
-        viewportAnchor="top-left"
-      />
-      {/* Baris kode di bawahnya */}
-      <ParticlesText
-        text={displayTyping}
-        typing
-        color="#ffb3ad"
-        size={6.7}
-        position={[-240, 35, 0]}
-        fade={1}
-        animated={false}
-        mobileMargin={{ left: 16, top: 132 }}
-        viewportMargin={{ left: 48, right: 32, top: 132, bottom: 32 }}
-      />
+      <CodeRain />
     </Canvas>
-  );
+  )
 }

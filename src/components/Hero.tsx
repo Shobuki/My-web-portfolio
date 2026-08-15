@@ -43,15 +43,26 @@ export default function Hero() {
 
   useEffect(() => {
     if (typeof window === "undefined") return
-    if (window.matchMedia("(max-width: 767px)").matches) return
+
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
+    if (window.matchMedia("(max-width: 767px)").matches || motionQuery.matches) return
+
+    const onMotionChange = () => setShowBackground(!motionQuery.matches)
+    motionQuery.addEventListener("change", onMotionChange)
 
     if ("requestIdleCallback" in window) {
       const idleId = window.requestIdleCallback(() => setShowBackground(true), { timeout: 1200 })
-      return () => window.cancelIdleCallback(idleId)
+      return () => {
+        motionQuery.removeEventListener("change", onMotionChange)
+        window.cancelIdleCallback(idleId)
+      }
     }
 
     const timeoutId = window.setTimeout(() => setShowBackground(true), 600)
-    return () => window.clearTimeout(timeoutId)
+    return () => {
+      motionQuery.removeEventListener("change", onMotionChange)
+      window.clearTimeout(timeoutId)
+    }
   }, [])
 
   return (
