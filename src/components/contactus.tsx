@@ -43,12 +43,12 @@ export default function ContactUs() {
   }
 
   return (
-    <section id="contactus" className="py-24 px-6 bg-[#110809] text-white">
+    <section id="contactus" className="py-24 px-6 bg-primary-black text-white">
       {/* 2. Container utama dibuat lebih lebar untuk menampung grid */}
       <div className="max-w-5xl mx-auto">
         <div className="text-center">
             <h2 className="text-4xl md:text-5xl font-light mb-12">
-                <span className="text-red-400">Contact</span> Me
+                <span className="text-text-primary">Contact</span> Me
             </h2>
         </div>
 
@@ -74,7 +74,7 @@ export default function ContactUs() {
                             type="text"
                             name="name"
                             required
-                            className="form-input w-full rounded-lg border-2 border-[#472426] bg-[#2c2c2c] p-3 text-text-primary focus:border-[var(--primary-red)] focus:ring-[var(--primary-red)]"
+                            className="form-input w-full rounded-lg border-2 border-outline-variant bg-surface-card p-3 text-text-primary focus:border-[var(--primary-red)] focus:ring-[var(--primary-red)]"
                             placeholder="Your Name"
                         />
                     </div>
@@ -84,7 +84,7 @@ export default function ContactUs() {
                             type="email"
                             name="email"
                             required
-                            className="form-input w-full rounded-lg border-2 border-[#472426] bg-[#2c2c2c] p-3 text-text-primary focus:border-[var(--primary-red)] focus:ring-[var(--primary-red)]"
+                            className="form-input w-full rounded-lg border-2 border-outline-variant bg-surface-card p-3 text-text-primary focus:border-[var(--primary-red)] focus:ring-[var(--primary-red)]"
                             placeholder="you@example.com"
                         />
                     </div>
@@ -94,13 +94,13 @@ export default function ContactUs() {
                             name="message"
                             required
                             rows={5}
-                            className="form-textarea w-full rounded-lg border-2 border-[#472426] bg-[#2c2c2c] p-3 text-text-primary focus:border-[var(--primary-red)] focus:ring-[var(--primary-red)]"
+                            className="form-textarea w-full rounded-lg border-2 border-outline-variant bg-surface-card p-3 text-text-primary focus:border-[var(--primary-red)] focus:ring-[var(--primary-red)]"
                             placeholder="Your message here..."
                         ></textarea>
                     </div>
 
                     {errorMsg && (
-                        <p className="text-sm text-red-400">{errorMsg}</p>
+                        <p className="text-sm text-primary-red">{errorMsg}</p>
                     )}
 
                     <div className="text-center md:text-left pt-4">
@@ -118,7 +118,7 @@ export default function ContactUs() {
             {/* Kanan: Opsi WhatsApp */}
             <div>
                 <h3 className="text-2xl font-semibold mb-6 text-white text-center md:text-left">Or Chat Directly</h3>
-                <div className="flex flex-col items-center justify-center text-center p-8 rounded-lg border-2 border-[#472426] bg-[#2c2c2c] h-full min-h-[300px]">
+                <div className="flex flex-col items-center justify-center text-center p-8 rounded-lg border-2 border-outline-variant bg-surface-card h-full min-h-[300px]">
                     <p className="text-text-secondary mb-6">
                         Click the icon below to start a direct chat with me on WhatsApp.
                     </p>
@@ -126,7 +126,7 @@ export default function ContactUs() {
                         href="https://wa.me/6289685352740" // <-- GANTI DENGAN NOMOR WHATSAPP ANDA
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-green-500 hover:text-green-400 transition-transform duration-300 hover:scale-110"
+                        className="text-primary-red hover:text-primary transition-transform duration-300 hover:scale-110"
                         aria-label="Chat on WhatsApp"
                     >
                         <SiWhatsapp size={90} />
@@ -149,7 +149,7 @@ export default function ContactUs() {
           onClick={() => setShowPopup(false)}
         />
         <div
-          className={`relative mx-4 w-full max-w-md rounded-2xl border border-white/10 bg-[#1e1020] p-6 text-center shadow-2xl transition-all ${showPopup ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}
+          className={`relative mx-4 w-full max-w-md rounded-2xl border border-outline-variant bg-surface-high p-6 text-center shadow-2xl transition-all ${showPopup ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}
           role="dialog"
           aria-modal="true"
         >

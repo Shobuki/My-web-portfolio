@@ -35,20 +35,20 @@ export default function Footer() {
   }, [])
 
   return (
-    <footer ref={footerRef} className="relative py-16 px-6 border-t border-slate-800">
+    <footer ref={footerRef} className="relative py-16 px-6 border-t border-outline-variant bg-primary-black">
       {/* Floating particles background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-10 w-2 h-2 bg-blue-400 rounded-full opacity-60 animate-pulse"></div>
+        <div className="absolute top-10 left-10 w-2 h-2 bg-primary-red rounded-full opacity-60 animate-pulse"></div>
         <div
-          className="absolute top-20 right-20 w-1 h-1 bg-cyan-400 rounded-full opacity-80 animate-pulse"
+          className="absolute top-20 right-20 w-1 h-1 bg-primary rounded-full opacity-80 animate-pulse"
           style={{ animationDelay: "1s" }}
         ></div>
         <div
-          className="absolute bottom-20 left-1/4 w-1.5 h-1.5 bg-purple-400 rounded-full opacity-70 animate-pulse"
+          className="absolute bottom-20 left-1/4 w-1.5 h-1.5 bg-primary-red rounded-full opacity-70 animate-pulse"
           style={{ animationDelay: "2s" }}
         ></div>
         <div
-          className="absolute bottom-10 right-1/3 w-1 h-1 bg-pink-400 rounded-full opacity-60 animate-pulse"
+          className="absolute bottom-10 right-1/3 w-1 h-1 bg-primary rounded-full opacity-60 animate-pulse"
           style={{ animationDelay: "0.5s" }}
         ></div>
       </div>
@@ -58,9 +58,9 @@ export default function Footer() {
           {/* About Column */}
           <div className="space-y-4">
             <h3 className="text-2xl font-light text-white tracking-wide">
-              <span className="text-blue-400">A</span>
+              <span className="text-primary">A</span>
             </h3>
-            <p className="text-slate-400 text-sm leading-relaxed">
+            <p className="text-text-secondary text-sm leading-relaxed">
               Full-stack engineer delivering robust APIs and intuitive interfaces with Node.js, TypeScript, React, and
               modern tooling. Focused on performance, accessibility, and clean code—taking products from concept to
               production with care.
@@ -80,7 +80,7 @@ export default function Footer() {
                       element.scrollIntoView({ behavior: "smooth" })
                     }
                   }}
-                  className="text-slate-400 hover:text-blue-400 transition-colors duration-300 text-sm text-left"
+                  className="text-text-secondary hover:text-primary transition-colors duration-300 text-sm text-left"
                 >
                   {item}
                 </button>
@@ -93,7 +93,7 @@ export default function Footer() {
             <h4 className="text-lg font-medium text-white">Services</h4>
             <div className="flex flex-col space-y-2">
               {["Web Development", "UI/UX Design", "Frontend Development", "Artificial Intelligence"].map((service) => (
-                <span key={service} className="text-slate-400 text-sm">
+                <span key={service} className="text-text-secondary text-sm">
                   {service}
                 </span>
               ))}
@@ -102,11 +102,11 @@ export default function Footer() {
         </div>
 
         {/* Bottom Section */}
-        <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-          <p className="text-slate-400 text-sm">
-            Made  <span className="text-red-400"></span> by <span className="text-blue-400">Alfredo</span>
+        <div className="pt-8 border-t border-outline-variant flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+          <p className="text-text-secondary text-sm">
+            Made  <span className="text-red-400"></span> by <span className="text-primary">Alfredo</span>
           </p>
-          <p className="text-slate-500 text-sm">© 2025 Alfredo. All rights reserved.</p>
+          <p className="text-text-secondary/80 text-sm">© 2025 Alfredo. All rights reserved.</p>
         </div>
       </div>
     </footer>

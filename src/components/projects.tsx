@@ -86,7 +86,7 @@ export default function Projects() {
         "/images/portfolio/asianet/asianet7.jpeg",
       ],
       tech: ["Golang","MySQL","Redis", "Next.js", "Flutter","Docker","AWS"],
-      color: "from-blue-500 to-cyan-500",
+      color: "from-primary-red to-primary",
       category: "Web Apps",
     },
     {
@@ -95,7 +95,7 @@ export default function Projects() {
       description: "Sunway Trek Masindo website for business",
       images: ["/images/portfolio/sunflexuser.png", "/images/portfolio/sunflexuser2.png"],
       tech: ["React", "Next.js", "Tailwind"],
-      color: "from-blue-500 to-cyan-500",
+      color: "from-primary-red to-primary",
       category: "Web Apps",
     },
     {
@@ -105,7 +105,7 @@ export default function Projects() {
         "Admin dashboard to manage Sunflex Store with transaction approval and automated email sending",
       image: "/images/portfolio/sunflexadmin.png",
       tech: ["Express.js", "PostgreSQL", "Prisma"],
-      color: "from-purple-500 to-pink-500",
+      color: "from-primary-red to-primary",
       category: "Web Apps",
     },
      {
@@ -116,7 +116,7 @@ export default function Projects() {
         "Admin dashboard to manage Sunflex Store with transaction approval and automated email sending",
       image: "/images/portfolio/web/travelika.png",
       tech: ["AngularJs", "IndexedDatabase"],
-      color: "from-purple-500 to-pink-500",
+      color: "from-primary-red to-primary",
       category: "Web Apps",
     },
      {
@@ -127,7 +127,7 @@ export default function Projects() {
         "Admin dashboard to manage Sunflex Store with transaction approval and automated email sending",
       image: "/images/portfolio/web/landingpage.png",
       tech: ["Next.js"],
-      color: "from-purple-500 to-pink-500",
+      color: "from-primary-red to-primary",
       category: "Web Apps",
     },
     {
@@ -142,7 +142,7 @@ export default function Projects() {
         "/images/portfolio/whatsapp/whatsapp4.jpeg",
       ],
       tech: ["Node.js", "JavaScript"],
-      color: "from-green-500 to-teal-500",
+      color: "from-primary-red to-primary",
       category: "Automation & Bots",
     },
     {
@@ -157,7 +157,7 @@ export default function Projects() {
         "/images/portfolio/food/4.png",
       ],
       tech: ["Python", "Streamlit", "Uvicorn"],
-      color: "from-orange-500 to-red-500",
+      color: "from-primary-red to-primary",
       category: "AI / ML",
     },
     {
@@ -166,7 +166,7 @@ export default function Projects() {
       description: "Scrape public data from Instagram and Twitter using Node.js + Puppeteer",
       images: ["/images/portfolio/datascraping/data1.png", "/images/portfolio/datascraping/data2.png"],
       tech: ["Node.js"],
-      color: "from-indigo-500 to-purple-500",
+      color: "from-primary-red to-primary",
       category: "Data & Scraping",
     },
     {
@@ -175,7 +175,7 @@ export default function Projects() {
       description: "Android app for pet lovers",
       image: "/images/portfolio/mypetz.jpeg",
       tech: ["Kotlin", "Google API Firebase"],
-      color: "from-lime-500 to-green-500",
+      color: "from-primary-red to-primary",
       category: "Mobile Apps",
     },
     {
@@ -184,7 +184,7 @@ export default function Projects() {
       description: "Simple POS Android application",
       image: "/images/portfolio/canggihku.jpeg",
       tech: ["Kotlin", "Google API Firebase"],
-      color: "from-lime-500 to-green-500",
+      color: "from-primary-red to-primary",
       category: "Mobile Apps",
     },
     {
@@ -193,7 +193,7 @@ export default function Projects() {
       description: "A fun little website for memes",
       image: "/images/portfolio/meme.png",
       tech: ["React.js", "Next.js"],
-      color: "from-lime-500 to-green-500",
+      color: "from-primary-red to-primary",
       category: "Fun / Misc",
     },
   ]
@@ -265,10 +265,10 @@ export default function Projects() {
 
   return (
     <section id="projects" ref={sectionRef} className="py-8 px-6">
-      <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-gradient-to-br from-[#b91c1c] to-[#4c0000] animate-blob opacity-20 blur-3xl rounded-full z-0" />
+      <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-gradient-to-br from-primary-red to-[#4c0000] animate-blob opacity-20 blur-3xl rounded-full z-0" />
       <div className="w-full max-w-screen-2xl mx-auto relative z-10">
         <h2 ref={titleRef} className="text-4xl md:text-5xl font-light text-center mb-10 md:mb-16">
-       <span className="text-white">Featured</span>    <span className="text-red-400">Projects</span>
+       <span className="text-text-primary">Featured</span> <span className="text-text-primary">Projects</span>
         </h2>
 
         {/* Category chips (wrap on mobile) */}
@@ -281,7 +281,7 @@ export default function Projects() {
                 onClick={() => setActiveCat(cat)}
                 className={`px-4 py-1.5 rounded-full text-sm transition
                   border border-white/10 bg-white/5
-                  ${active ? "text-white bg-white/20 shadow" : "text-slate-300 hover:bg-white/10"}`}
+                  ${active ? "text-primary bg-primary-red/15 border-primary-red shadow" : "text-text-secondary hover:bg-surface-high"}`}
                 aria-pressed={active}
               >
                 {cat}
@@ -299,7 +299,7 @@ export default function Projects() {
 
             const card = (
               <div
-                className={`project-card group w-full h-full relative rounded-2xl bg-slate-900/50 backdrop-blur-md border border-[#b91c1c]/40 hover:border-[#b91c1c]/80 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-[#b91c1c]/30 overflow-hidden flex flex-col ${
+                className={`project-card group w-full h-full relative rounded-2xl bg-surface-high/70 backdrop-blur-md border border-outline-variant hover:border-primary transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-primary-red/20 overflow-hidden flex flex-col ${
                   hasLink ? "cursor-pointer" : ""
                 }`}
               >
@@ -399,31 +399,31 @@ export default function Projects() {
 
                 <div className="p-4 sm:p-6 space-y-3">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 md:gap-3 min-w-0">
-                    <h3 className="flex-1 min-w-0 text-base sm:text-lg md:text-xl font-semibold text-white group-hover:text-[#b91c1c] transition-colors duration-300 leading-snug line-clamp-2">
+                    <h3 className="flex-1 min-w-0 text-base sm:text-lg md:text-xl font-semibold text-text-primary group-hover:text-primary transition-colors duration-300 leading-snug line-clamp-2">
                       {project.title}
                     </h3>
                     <div className="flex items-center gap-2 flex-wrap md:flex-nowrap flex-shrink-0">
-                      <span className="text-[11px] px-2 py-1 rounded-full bg-white/10 text-slate-300 border border-white/10 whitespace-nowrap">
+                      <span className="text-[11px] px-2 py-1 rounded-full bg-surface-card text-text-secondary border border-outline-variant whitespace-nowrap">
                         {project.category}
                       </span>
                       {hasLink ? (
-                        <span className="text-[10px] px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-400/30 whitespace-nowrap">
+                        <span className="text-[10px] px-2 py-1 rounded-full bg-primary-red/10 text-primary border border-primary-red/30 whitespace-nowrap">
                           click to open
                         </span>
                       ) : (
                         <a
                           href="#contactus"
-                          className="text-[10px] px-2 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-400/30 hover:bg-amber-500/20 transition whitespace-nowrap"
+                          className="text-[10px] px-2 py-1 rounded-full bg-primary-red/10 text-primary border border-primary-red/30 hover:bg-primary-red/20 transition whitespace-nowrap"
                         >
                           contact me to see
                         </a>
                       )}
                     </div>
                   </div>
-                  <p className="text-slate-400 text-[12px] sm:text-sm md:text-[15px] leading-relaxed break-words">{project.description}</p>
+                  <p className="text-text-secondary text-[12px] sm:text-sm md:text-[15px] leading-relaxed break-words">{project.description}</p>
                   <div className="flex flex-wrap gap-2 pt-1">
                     {project.tech.map((tech) => (
-                      <span key={tech} className="px-3 py-1 text-xs bg-slate-800 text-slate-300 rounded-full">
+                      <span key={tech} className="px-3 py-1 text-xs bg-surface-card text-text-secondary rounded-full">
                         {tech}
                       </span>
                     ))}

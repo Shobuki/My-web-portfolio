@@ -66,7 +66,7 @@ export default function Home() {
       <main className="flex-1">
         <Hero />
         <div
-          style={{ background: "var(--primary-black, #110809)" }}
+          style={{ background: "var(--primary-black)" }}
           className="px-0 sm:px-4 md:px-10 lg:px-20"
         >
           <div className="mx-auto max-w-none lg:max-w-screen-2xl">

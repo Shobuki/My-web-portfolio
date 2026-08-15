@@ -24,10 +24,10 @@ const testimonies = [
 
 export default function Testimony() {
   return (
-    <section className="py-5 px-6 bg-[#110809] text-white" id="testimony">
+    <section className="py-5 px-6 bg-primary-black text-white" id="testimony">
       <div className="max-w-5xl mx-auto text-center">
         <h2 className="text-4xl md:text-5xl font-light mb-12">
-          My <span className="text-red-400">Clients</span> Say
+          My <span className="text-text-primary">Clients</span> Say
         </h2>
 
         <Swiper
@@ -41,8 +41,8 @@ export default function Testimony() {
         >
           {testimonies.map((item, index) => (
             <SwiperSlide key={index}>
-              <div className="flex flex-col items-center gap-0 bg-slate-900/50 backdrop-blur-md border border-[#b91c1c]/40 rounded-2xl p-6 md:p-7 shadow-lg max-w-xl mx-auto">
-                <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden border border-[#b91c1c]/50 shadow-md">
+              <div className="flex flex-col items-center gap-0 bg-surface-high/70 backdrop-blur-md border border-outline-variant rounded-2xl p-6 md:p-7 shadow-lg shadow-primary-black/40 max-w-xl mx-auto">
+                <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden border border-primary-red/50 shadow-md shadow-primary-black/40">
                   <Image
                     src={item.image}
                     alt={item.name}
@@ -52,8 +52,8 @@ export default function Testimony() {
                   />
                 </div>
 
-                <p className="text-slate-300 text-lg italic mt-2">{item.quote}</p>
-                <p className="text-red-300 font-semibold text-xl">{item.name}</p>
+                <p className="text-text-secondary text-lg italic mt-2">{item.quote}</p>
+                <p className="text-text-primary font-semibold text-xl">{item.name}</p>
               </div>
             </SwiperSlide>
           ))}

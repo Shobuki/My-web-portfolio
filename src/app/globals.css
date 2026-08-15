@@ -1,8 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #1b1112;
+  --foreground: #f2dedf;
+  --primary-red: #ff5451;
+  --primary-black: #150c0d;
+  --surface-card: #2c2c2c;
+  --surface-high: #332728;
+  --outline: #ad8885;
+  --outline-variant: #5d3f3d;
+  --text-primary: #f2f2f2;
+  --text-secondary: #e0b4b6;
 }
 :root, html, body, #__next {
   max-width: 100%;
@@ -17,24 +25,34 @@ html {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #1b1b1b;
+  background: var(--primary-black);
 }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg,#e71d36,#4267b2);
+  background: linear-gradient(180deg, #ff5451, #b91c1c);
   border-radius: 8px;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary-red: var(--primary-red);
+  --color-primary: #ffb3ad;
+  --color-primary-black: var(--primary-black);
+  --color-secondary-black: var(--surface-card);
+  --color-surface-card: var(--surface-card);
+  --color-surface-high: var(--surface-high);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1b1112;
+    --foreground: #f2dedf;
   }
 }
 

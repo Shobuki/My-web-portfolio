@@ -69,7 +69,7 @@ export default function Hero() {
       "
       style={{
         background:
-          "radial-gradient(1200px 600px at 10% 10%, rgba(231,29,54,0.10), transparent), radial-gradient(1200px 600px at 90% 20%, rgba(66,103,178,0.10), transparent)"
+          "radial-gradient(1200px 600px at 10% 10%, rgba(255,84,81,0.14), transparent), radial-gradient(1200px 600px at 90% 20%, rgba(185,28,28,0.10), transparent)"
       }}
     >
       {/* Background 3D: dimatikan di layar kecil untuk performa */}
@@ -78,7 +78,7 @@ export default function Hero() {
       </div>
 
       {/* Overlay halus biar teks kontras */}
-      <div className="pointer-events-none absolute inset-0 bg-slate-950/25 sm:bg-slate-950/30 backdrop-blur-[1px]" aria-hidden />
+      <div className="pointer-events-none absolute inset-0 bg-primary-black/35 sm:bg-primary-black/45 backdrop-blur-[1px]" aria-hidden />
 
       {/* Content */}
       <div className="relative z-10 text-center space-y-6 sm:space-y-8 max-w-4xl mx-auto">
@@ -101,7 +101,7 @@ export default function Hero() {
           className="
             mx-auto max-w-[42rem]
             text-base sm:text-lg md:text-xl
-            text-gray-200
+            text-text-secondary
             drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)]
             px-1
           "
@@ -117,11 +117,11 @@ export default function Hero() {
           <Button
             className="
               w-full sm:w-auto
-              bg-gradient-to-r from-primary-red to-[#e71d36]
-              hover:from-[#e71d36] hover:to-primary-red
+              bg-gradient-to-r from-primary-red to-[#b91c1c]
+              hover:from-[#b91c1c] hover:to-primary-red
               text-white px-6 sm:px-8 py-3 sm:py-4
               rounded-full text-base sm:text-lg font-bold
-              shadow-lg hover:shadow-red-400/25
+              shadow-lg hover:shadow-primary-red/25
               transition-all duration-300 hover:scale-105
               uppercase tracking-wider
             "
@@ -133,8 +133,8 @@ export default function Hero() {
           <Button
             className="
               w-full sm:w-auto
-              bg-white/10 backdrop-blur-md border border-white/20
-              text-white hover:bg-white/20 hover:border-white/30
+              bg-surface-high/70 backdrop-blur-md border border-outline-variant
+              text-text-primary hover:bg-surface-card hover:border-primary
               px-6 sm:px-8 py-3 sm:py-4 rounded-full
               text-base sm:text-lg font-medium shadow-lg
               transition-all duration-300 hover:scale-105
@@ -154,7 +154,7 @@ export default function Hero() {
             href="https://www.instagram.com/das_alfredo/"
             target="_blank"
             rel="noopener noreferrer"
-            className="focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e71d36] rounded-full"
+            className="focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-red rounded-full"
             aria-label="Instagram"
           >
             <Image
@@ -170,7 +170,7 @@ export default function Hero() {
             href="https://www.linkedin.com/in/alfredo-da-gonza/"
             target="_blank"
             rel="noopener noreferrer"
-            className="focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e71d36] rounded-full"
+            className="focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-red rounded-full"
             aria-label="LinkedIn"
           >
             <Image
@@ -186,7 +186,7 @@ export default function Hero() {
             href="https://github.com/Shobuki"
             target="_blank"
             rel="noopener noreferrer"
-            className="focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e71d36] rounded-full"
+            className="focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-red rounded-full"
             aria-label="GitHub"
           >
             <Image

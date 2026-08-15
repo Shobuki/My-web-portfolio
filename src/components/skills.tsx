@@ -1,6 +1,7 @@
 // D:\kodingan\pribadi\src\components\skills.tsx
 import React, { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { Link2, Radio } from "lucide-react";
 import {
   SiHtml5, SiCss3, SiJavascript, SiTypescript, SiReact, SiNextdotjs, SiTailwindcss,
   SiNodedotjs, SiExpress, SiPostgresql, SiPython, SiKotlin, SiGo, SiAngular, SiVuedotjs,
@@ -25,53 +26,51 @@ interface Skill {
   shadowColor: string; // Tailwind shadow-* class
 }
 
-// ---------- Small glyphs (for non-brand items)
-const Glyph: React.FC<{ glyph: string; className?: string }> = ({ glyph, className }) => (
-  <span className={className} role="img" aria-hidden="true">{glyph}</span>
-);
-const RestIcon: React.FC<{ className?: string }> = ({ className }) => <Glyph glyph="🔗" className={className} />;
-const WebSocketIcon: React.FC<{ className?: string }> = ({ className }) => <Glyph glyph="📡" className={className} />;
+// ---------- Non-brand icons use the same vector sizing as skill logos
+const RestIcon: React.FC<{ className?: string }> = ({ className }) => <Link2 className={className} aria-hidden="true" />;
+const WebSocketIcon: React.FC<{ className?: string }> = ({ className }) => <Radio className={className} aria-hidden="true" />;
 
 // ---------- Data
 const skillsByCategory: Record<Category, Skill[]> = {
   "Programming Languages": [
-    { icon: SiJavascript, name: "JavaScript", color: "text-yellow-400", shadowColor: "shadow-yellow-400/40" },
-    { icon: SiTypescript, name: "TypeScript", color: "text-blue-600", shadowColor: "shadow-blue-600/40" },
-    { icon: SiPython, name: "Python", color: "text-yellow-300", shadowColor: "shadow-yellow-300/40" },
-    { icon: SiKotlin, name: "Kotlin", color: "text-purple-500", shadowColor: "shadow-purple-500/40" },
-    { icon: SiGo, name: "Go (Golang)", color: "text-cyan-500", shadowColor: "shadow-cyan-500/40" },
+    { icon: SiJavascript, name: "JavaScript", color: "text-yellow-400", shadowColor: "shadow-primary-red/20" },
+    { icon: SiTypescript, name: "TypeScript", color: "text-blue-600", shadowColor: "shadow-primary-red/20" },
+    { icon: SiPython, name: "Python", color: "text-yellow-300", shadowColor: "shadow-primary-red/20" },
+    { icon: SiKotlin, name: "Kotlin", color: "text-purple-500", shadowColor: "shadow-primary-red/20" },
+    { icon: SiGo, name: "Go (Golang)", color: "text-cyan-500", shadowColor: "shadow-primary-red/20" },
+    { icon: ({ className }) => <span className={`${className} flex items-center justify-center font-bold`}>C#</span>, name: "C#", color: "text-purple-500", shadowColor: "shadow-primary-red/20" },
   ],
   "Frameworks & Libraries": [
-    { icon: SiReact, name: "React.js", color: "text-sky-400", shadowColor: "shadow-sky-400/40" },
-    { icon: SiAngular, name: "Angular", color: "text-red-500", shadowColor: "shadow-red-500/40" },
-    { icon: SiVuedotjs, name: "Vue.js", color: "text-emerald-500", shadowColor: "shadow-emerald-500/40" },
-    { icon: SiNextdotjs, name: "Next.js", color: "text-neutral-300", shadowColor: "shadow-neutral-300/30" },
-    { icon: SiExpress, name: "Express.js", color: "text-neutral-400", shadowColor: "shadow-neutral-400/30" },
-    { icon: SiNodedotjs, name: "Node.js", color: "text-green-500", shadowColor: "shadow-green-500/40" },
-    { icon: SiDotnet, name: ".NET", color: "text-purple-400", shadowColor: "shadow-purple-400/40" },
+    { icon: SiReact, name: "React.js", color: "text-sky-400", shadowColor: "shadow-primary-red/20" },
+    { icon: SiAngular, name: "Angular", color: "text-red-500", shadowColor: "shadow-primary-red/20" },
+    { icon: SiVuedotjs, name: "Vue.js", color: "text-emerald-500", shadowColor: "shadow-primary-red/20" },
+    { icon: SiNextdotjs, name: "Next.js", color: "text-neutral-300", shadowColor: "shadow-primary-red/20" },
+    { icon: SiExpress, name: "Express.js", color: "text-neutral-400", shadowColor: "shadow-primary-red/20" },
+    { icon: SiNodedotjs, name: "Node.js", color: "text-green-500", shadowColor: "shadow-primary-red/20" },
+    { icon: SiDotnet, name: ".NET", color: "text-purple-400", shadowColor: "shadow-primary-red/20" },
   ],
   "Web Fundamentals": [
-    { icon: SiHtml5, name: "HTML", color: "text-orange-500", shadowColor: "shadow-orange-500/40" },
-    { icon: SiCss3, name: "CSS", color: "text-blue-500", shadowColor: "shadow-blue-500/40" },
-    { icon: SiTailwindcss, name: "Tailwind CSS", color: "text-cyan-400", shadowColor: "shadow-cyan-400/40" },
+    { icon: SiHtml5, name: "HTML", color: "text-orange-500", shadowColor: "shadow-primary-red/20" },
+    { icon: SiCss3, name: "CSS", color: "text-blue-500", shadowColor: "shadow-primary-red/20" },
+    { icon: SiTailwindcss, name: "Tailwind CSS", color: "text-cyan-400", shadowColor: "shadow-primary-red/20" },
   ],
   "API & Architecture": [
-    { icon: RestIcon, name: "REST API", color: "text-indigo-400", shadowColor: "shadow-indigo-400/40" },
-    { icon: WebSocketIcon, name: "WebSocket", color: "text-fuchsia-400", shadowColor: "shadow-fuchsia-400/40" },
+    { icon: RestIcon, name: "REST API", color: "text-indigo-400", shadowColor: "shadow-primary-red/20" },
+    { icon: WebSocketIcon, name: "WebSocket", color: "text-fuchsia-400", shadowColor: "shadow-primary-red/20" },
   ],
   "Tools & Platforms": [
-    { icon: SiDocker, name: "Docker", color: "text-blue-500", shadowColor: "shadow-blue-500/40" },
-    { icon: SiGit, name: "Git / GitHub", color: "text-orange-600", shadowColor: "shadow-orange-600/40" },
-    { icon: SiPostgresql, name: "PostgreSQL", color: "text-blue-400", shadowColor: "shadow-blue-400/40" },
+    { icon: SiDocker, name: "Docker", color: "text-blue-500", shadowColor: "shadow-primary-red/20" },
+    { icon: SiGit, name: "Git / GitHub", color: "text-orange-600", shadowColor: "shadow-primary-red/20" },
+    { icon: SiPostgresql, name: "PostgreSQL", color: "text-blue-400", shadowColor: "shadow-primary-red/20" },
   ],
   "Testing & Documentation Tools": [
-    { icon: SiSwagger, name: "Swagger", color: "text-green-500", shadowColor: "shadow-green-500/40" },
-    { icon: SiPostman, name: "Postman", color: "text-orange-500", shadowColor: "shadow-orange-500/40" },
-    { icon: SiSelenium, name: "Selenium", color: "text-green-600", shadowColor: "shadow-green-600/40" },
-    { icon: SiJest, name: "Jest", color: "text-rose-500", shadowColor: "shadow-rose-500/40" },
-    { icon: SiMocha, name: "Mocha", color: "text-amber-600", shadowColor: "shadow-amber-600/40" },
-    { icon: SiChai, name: "Chai", color: "text-red-600", shadowColor: "shadow-red-600/40" },
-    { icon: SiCypress, name: "Cypress", color: "text-neutral-200", shadowColor: "shadow-neutral-200/30" },
+    { icon: SiSwagger, name: "Swagger", color: "text-green-500", shadowColor: "shadow-primary-red/20" },
+    { icon: SiPostman, name: "Postman", color: "text-orange-500", shadowColor: "shadow-primary-red/20" },
+    { icon: SiSelenium, name: "Selenium", color: "text-green-600", shadowColor: "shadow-primary-red/20" },
+    { icon: SiJest, name: "Jest", color: "text-rose-500", shadowColor: "shadow-primary-red/20" },
+    { icon: SiMocha, name: "Mocha", color: "text-amber-600", shadowColor: "shadow-primary-red/20" },
+    { icon: SiChai, name: "Chai", color: "text-red-600", shadowColor: "shadow-primary-red/20" },
+    { icon: SiCypress, name: "Cypress", color: "text-neutral-200", shadowColor: "shadow-primary-red/20" },
   ],
 };
 
@@ -88,7 +87,7 @@ const SkillCard: React.FC<SkillCardProps> = ({ icon: Icon, name, color, shadowCo
   <motion.div
     variants={itemVariants}
     className={`group flex flex-col items-center justify-center ${compact ? "p-4" : "p-5"}
-                bg-white/5 rounded-xl border border-white/10 hover:bg-white/10
+                bg-surface-high/70 rounded-xl border border-outline-variant hover:bg-surface-card
                 hover:-translate-y-1 transition-all duration-200 shadow-lg ${shadowColor}`}
     title={name}
   >
@@ -139,7 +138,7 @@ const Skills: React.FC = () => {
   return (
     <motion.section
       id="skills"
-      className="py-10 md:py-12 bg-[#221016] rounded-lg border border-white/10"
+      className="py-10 md:py-12 bg-surface-dim rounded-lg border border-outline-variant"
       initial={{ opacity: 0, y: 24, scale: 0.98 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, amount: 0.25 }}
@@ -153,7 +152,7 @@ const Skills: React.FC = () => {
 
         {/* Segmented tabs (wrap on mobile) with animated active pill */}
         <div role="tablist" aria-label="Skill Categories" className="flex justify-center">
-          <div className="relative flex flex-wrap md:flex-nowrap gap-2 p-1 bg-white/5 border border-white/10 rounded-full">
+          <div className="relative flex flex-wrap md:flex-nowrap gap-2 p-1 bg-surface-high/70 border border-outline-variant rounded-full">
             {tabs.map((cat) => {
               const selected = active === cat;
               const id = toId(String(cat));
@@ -167,8 +166,8 @@ const Skills: React.FC = () => {
                   tabIndex={selected ? 0 : -1}
                   onClick={() => setActive(cat)}
                   className={`relative whitespace-nowrap px-3.5 md:px-4 py-1.5 md:py-2 rounded-full text-sm md:text-base
-                              transition focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400/60
-                              ${selected ? "text-white" : "text-neutral-300 hover:bg-white/10"}`}
+                              transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-red/60
+                              ${selected ? "text-white" : "text-text-secondary hover:bg-surface-card"}`}
                 >
                   {selected && (
                     <motion.span

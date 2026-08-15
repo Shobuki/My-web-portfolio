@@ -47,15 +47,15 @@ const MusicPlayer: React.FC = () => {
             className={`flex items-center gap-2 px-4 py-1.5 rounded-full shadow font-bold text-xs tracking-wide
                 border transition-all
                 ${showPlaylist
-                    ? 'bg-gradient-to-r from-[#4267b2] to-[#e71d36] text-white border-white scale-105'
-                    : 'bg-white/20 text-blue-300 border-transparent hover:bg-white/30 hover:text-blue-400'}`}
+                    ? 'bg-gradient-to-r from-primary-red to-[#b91c1c] text-white border-white scale-105'
+                    : 'bg-white/20 text-primary border-transparent hover:bg-white/30 hover:text-primary-red'}`}
             onClick={() => setShowPlaylist(!showPlaylist)}
             style={{ minWidth: 120, margin: '0 auto' }}
         >
             <FaMusic className="text-base" />
             <span>{showPlaylist ? "Tutup Playlist" : "Tampilkan Playlist"}</span>
             <span
-                className="inline-block bg-white/60 text-blue-800 rounded-full px-2 py-0.5 ml-1 font-mono text-xs font-bold"
+                className="inline-block bg-white/60 text-[#690005] rounded-full px-2 py-0.5 ml-1 font-mono text-xs font-bold"
                 style={{ minWidth: 24, textAlign: "center" }}
             >{playlist.length}</span>
             {showPlaylist ? <FaChevronDown className="ml-1" /> : <FaChevronUp className="ml-1" />}
@@ -194,7 +194,7 @@ const MusicPlayer: React.FC = () => {
     // === SATU TOMBOL SAJA (FAB) ===
     const ToggleOpenCloseButton = (
         <button
-            className="fixed bottom-4 right-4 z-[60] rounded-full p-3 shadow-lg bg-gradient-to-br from-[#4267b2] to-[#e71d36] text-white hover:scale-105 transition"
+            className="fixed bottom-4 right-4 z-[60] rounded-full p-3 shadow-lg shadow-primary-black/40 bg-gradient-to-br from-primary-red to-[#b91c1c] text-white hover:scale-105 transition"
             onClick={() => setShowPanel(prev => !prev)}
             aria-label={showPanel ? "Tutup music player" : "Buka music player"}
             title={showPanel ? "Tutup music player" : "Buka music player"}
@@ -259,7 +259,7 @@ const MusicPlayer: React.FC = () => {
                         {/* waveform dijadikan overlay agar tidak menambah tinggi */}
                         <div className="absolute inset-x-0 top-0 h-5 bg-repeat-x bg-[url('/waveform.svg')] bg-contain opacity-60 pointer-events-none" />
 
-                        <h2 className="text-lg font-bold !text-red-500 leading-tight mt-2">
+                        <h2 className="text-lg font-bold text-text-primary leading-tight mt-2">
                             My Fav Song:
                         </h2>
                         {/* judul — tanpa margin-top bawaan, rapat ke atas */}
@@ -288,7 +288,7 @@ const MusicPlayer: React.FC = () => {
                                 value={progress}
                                 onChange={handleSeek}
                                 style={{
-                                    background: 'linear-gradient(90deg, #e71d36 0%, #4267b2 100%)',
+                                    background: 'linear-gradient(90deg, #ff5451 0%, #b91c1c 100%)',
                                     height: 4,
                                     borderRadius: 8,
                                     outline: 'none',
@@ -313,7 +313,7 @@ const MusicPlayer: React.FC = () => {
                                     width: 100,
                                     height: 8,
                                     borderRadius: 8,
-                                    background: 'linear-gradient(90deg,#fff 0%,#e71d36 80%)',
+                                    background: 'linear-gradient(90deg,#f2dedf 0%,#ff5451 80%)',
                                     appearance: 'none',
                                 }}
                             />
@@ -325,9 +325,9 @@ const MusicPlayer: React.FC = () => {
                             <button
                                 onClick={() => setShuffle(!shuffle)}
                                 title="Shuffle"
-                                className={`rounded-full p-2 transition ${shuffle ? 'bg-[#4267b2]/70 scale-110 shadow' : 'hover:bg-white/20'}`}
+                                className={`rounded-full p-2 transition ${shuffle ? 'bg-primary-red/70 scale-110 shadow' : 'hover:bg-white/20'}`}
                             >
-                                <FaRandom className={shuffle ? 'text-white' : 'text-gray-300'} />
+                                <FaRandom className={shuffle ? 'text-white' : 'text-text-secondary'} />
                             </button>
                             <button onClick={handlePrevious} title="Previous" className="rounded-full p-2 hover:bg-white/20 transition">
                                 <FaBackward />
@@ -348,7 +348,7 @@ const MusicPlayer: React.FC = () => {
                                 title="Repeat"
                                 className={`rounded-full p-2 transition ${repeat ? 'bg-[#e71d36]/80 scale-110 shadow' : 'hover:bg-white/20'}`}
                             >
-                                <FaRedo className={repeat ? 'text-white' : 'text-gray-300'} />
+                                <FaRedo className={repeat ? 'text-white' : 'text-text-secondary'} />
                             </button>
                         </div>
 
@@ -388,13 +388,13 @@ const MusicPlayer: React.FC = () => {
                                         className={`
           cursor-pointer flex items-center gap-2 px-2 py-2 rounded-xl transition
           ${index === currentIndex
-                                                ? 'bg-gradient-to-r from-[#e71d36]/80 to-[#4267b2]/90 text-white font-bold shadow'
-                                                : 'hover:bg-white/10 text-gray-200 font-semibold'}
+                                                ? 'bg-gradient-to-r from-[#e71d36]/80 to-[#b91c1c]/90 text-white font-bold shadow'
+                                                : 'hover:bg-white/10 text-text-primary font-semibold'}
         `}
                                         onClick={() => handleSelect(index)}
                                     >
                                         <span className="text-rose-400">🎵</span> {song.title}
-                                        <span className="ml-auto text-xs text-blue-200 italic">{song.artist}</span>
+                                        <span className="ml-auto text-xs text-primary italic">{song.artist}</span>
                                     </li>
                                 ))}
                             </ul>

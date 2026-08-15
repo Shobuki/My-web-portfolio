@@ -31,11 +31,11 @@ const experiences: ExperienceItem[] = [
       "Deployed services in Docker and collaborated using Git-based workflows (branching, rebasing, CI).",
     ],
     techStack: [
-      { icon: SiGo, name: "Golang", color: "text-cyan-500" },
-      { icon: SiMysql, name: "MySQL", color: "text-blue-500" },
-      { icon: SiDocker, name: "Docker", color: "text-sky-500" },
-      { icon: SiAmazonwebservices, name: "AWS", color: "text-orange-400" },
-      { icon: SiGit, name: "Git", color: "text-orange-600" },
+      { icon: SiGo, name: "Golang", color: "text-primary" },
+      { icon: SiMysql, name: "MySQL", color: "text-primary" },
+      { icon: SiDocker, name: "Docker", color: "text-primary" },
+      { icon: SiAmazonwebservices, name: "AWS", color: "text-primary-red" },
+      { icon: SiGit, name: "Git", color: "text-primary-red" },
     ],
   },
 ];
@@ -61,13 +61,13 @@ const ExperienceCard: React.FC<{ item: ExperienceItem }> = ({ item }) => (
                hover:bg-white/[0.07] transition-colors duration-300 shadow-lg shadow-black/20"
   >
     {/* Accent line */}
-    <div className="absolute left-0 top-0 h-full w-1 rounded-full bg-gradient-to-b from-fuchsia-500 to-indigo-500" />
+    <div className="absolute left-0 top-0 h-full w-1 rounded-full bg-gradient-to-b from-primary-red to-primary" />
 
     {/* Header */}
     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4">
       <div>
         <h3 className="text-xl md:text-2xl font-bold text-neutral-100">{item.role}</h3>
-        <p className="text-lg text-fuchsia-400 font-semibold mt-0.5">{item.company}</p>
+        <p className="text-lg text-text-secondary font-semibold mt-0.5">{item.company}</p>
       </div>
       <span className="shrink-0 inline-flex items-center gap-1.5 text-sm text-neutral-400 bg-white/5 border border-white/10 rounded-full px-3 py-1">
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -84,7 +84,7 @@ const ExperienceCard: React.FC<{ item: ExperienceItem }> = ({ item }) => (
     <ul className="space-y-2.5 mb-5">
       {item.highlights.map((h, i) => (
         <li key={i} className="flex items-start gap-2.5 text-sm md:text-base text-neutral-300">
-          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-fuchsia-500 shrink-0" />
+          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary-red shrink-0" />
           {h}
         </li>
       ))}
@@ -109,7 +109,7 @@ const ExperienceCard: React.FC<{ item: ExperienceItem }> = ({ item }) => (
 const Experience: React.FC = () => (
   <motion.section
     id="experience"
-    className="py-10 md:py-12 bg-[#1a0f15] rounded-lg border border-white/10"
+    className="py-10 md:py-12 bg-surface-dim rounded-lg border border-outline-variant"
     initial={{ opacity: 0, y: 24, scale: 0.98 }}
     whileInView={{ opacity: 1, y: 0, scale: 1 }}
     viewport={{ once: true, amount: 0.2 }}

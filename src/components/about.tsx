@@ -79,8 +79,8 @@ export default function About() {
           <div ref={imageRef} className="space-y-12">
             {/* Profile Image (tetap sama) */}
             <div className="relative w-80 h-80 mx-auto">
-              <div className="absolute inset-0 bg-[#b91c1c] rounded-full blur-3xl opacity-20"></div>
-              <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-[#b91c1c]/40 hover:border-[#b91c1c]/80 hover:scale-105 hover:rotate-3 transition-all duration-500">
+              <div className="absolute inset-0 bg-primary-red rounded-full blur-3xl opacity-20"></div>
+              <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-primary-red/40 hover:border-primary hover:scale-105 hover:rotate-3 transition-all duration-500">
                 <Image src="/images/me.jpeg" alt="Profile" fill className="object-cover" />
               </div>
             </div>
@@ -92,7 +92,7 @@ export default function About() {
                 {["Machine Learning", "Artificial Intelligence", "Sentiment Analysis", "Data Analyst", "Scrum"].map((topic) => (
                   <span
                     key={topic}
-                    className="px-4 py-2 rounded-full bg-slate-800 text-sm text-slate-300 border border-slate-600 hover:border-[#b91c1c] hover:bg-[#4b1b1b] transition-all"
+                    className="px-4 py-2 rounded-full bg-surface-high text-sm text-text-secondary border border-outline-variant hover:border-primary hover:bg-surface-card transition-all"
                   >
                     {topic}
                   </span>
@@ -109,10 +109,10 @@ export default function About() {
               </h2>
 
               {/* GANTI PARAGRAF LAMA DENGAN YANG INI */}
-              <p className="text-gray-300 text-lg leading-relaxed mb-6">
+              <p className="text-text-secondary text-lg leading-relaxed mb-6">
                 I am a passionate web developer and a dedicated student at <span className="text-white font-semibold">Universitas Bunda Mulia</span>, currently specializing in <span className="text-white font-semibold">Full-Stack Web Development</span>. My journey into coding began with a simple curiosity that has now blossomed into a full-fledged drive to solve complex problems through technology.
               </p>
-              <p className="text-gray-300 text-lg leading-relaxed mb-6">
+              <p className="text-text-secondary text-lg leading-relaxed mb-6">
                 While I enjoy crafting seamless front-end experiences, my deeper interests lie in the robust logic of <span className="text-white font-semibold">Backend Development</span> and the boundless potential of <span className="text-white font-semibold">Artificial Intelligence</span>. I strive to build products that are not only efficient but also intuitive and enjoyable, always eager to learn and embrace new challenges.
               </p>
               {/* BATAS PENGGANTIAN */}

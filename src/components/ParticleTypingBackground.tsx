@@ -46,7 +46,7 @@ function useTextPoints(text: string, fontSize = 80) {
 function ParticlesText({
   text,
   typing,
-  color = "#f3e7fa",
+  color = "#f2dedf",
   size = 4.5,
   position = [0, 0, 0],
   fade = 1,
@@ -264,12 +264,12 @@ export default function ParticleTypingBackground() {
     <Canvas
       camera={{ position: [0, 0, 350], fov: 75 }}
       style={{
-        position: 'fixed',
+        position: 'absolute',
         inset: 0,
-        zIndex: -1,                 // di belakang konten
-        width: '100vw',
-        height: 'calc(var(--vh, 1vh) * 100)', // 100svh fallback
-        background: 'radial-gradient(ellipse at 40% 25%, #340e1e 0%, #221016 100%)',
+        zIndex: 0,                  // di atas background hero, di bawah overlay/konten
+        width: '100%',
+        height: '100%',
+        background: 'radial-gradient(ellipse at 40% 25%, #4b171a 0%, #150c0d 100%)',
         pointerEvents: 'none',      // jangan blok scroll/klik
       }}
       gl={{
@@ -283,7 +283,7 @@ export default function ParticleTypingBackground() {
       <ParticlesText
         text={ALFREDO}
         typing
-        color="#ffffff"
+        color="#f2dedf"
         size={10}
         position={[-260, 100, 0]}
         fade={alfredoFade}
@@ -296,7 +296,7 @@ export default function ParticleTypingBackground() {
       <ParticlesText
         text={displayTyping}
         typing
-        color="#fff0fa"
+        color="#ffb3ad"
         size={6.7}
         position={[-240, 35, 0]}
         fade={1}
