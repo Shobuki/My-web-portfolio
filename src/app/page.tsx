@@ -7,6 +7,8 @@ import Hero from "@/components/Hero";
 
 const Footer = dynamic(() => import("@/components/Footer"));
 const AboutSection = dynamic(() => import("@/components/about"));
+const WakaTimeStats = dynamic(() => import("@/components/WakaTimeStats"));
+const DeveloperMetrics = dynamic(() => import("@/components/DeveloperMetrics"));
 const Skills = dynamic(() => import("@/components/skills"));
 const Experience = dynamic(() => import("@/components/experience"));
 const Projects = dynamic(() => import("@/components/projects"));
@@ -19,6 +21,20 @@ function SectionPlaceholder({ className = "" }: { className?: string }) {
       aria-hidden
       className={`w-full animate-pulse rounded-3xl border border-white/5 bg-white/[0.03] ${className}`}
     />
+  );
+}
+
+function MetricsPlaceholder() {
+  return (
+    <div aria-hidden className="grid gap-5 py-10 lg:grid-cols-[0.8fr_1.2fr]">
+      {[0, 1].map((item) => (
+        <div key={item} className="space-y-5 rounded-2xl border border-outline-variant bg-surface-high/70 p-6">
+          <div className="h-11 w-48 animate-pulse rounded-xl bg-surface-card" />
+          <div className="h-24 animate-pulse rounded-xl bg-surface-card" />
+          <div className="h-9 w-32 animate-pulse rounded-full bg-surface-card" />
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -92,6 +108,12 @@ export default function Home() {
           <div className="mx-auto max-w-none lg:max-w-screen-2xl">
             <DeferredSection className="min-h-[420px]">
               <AboutSection />
+            </DeferredSection>
+            <DeferredSection rootMargin="300px 0px" placeholder={<MetricsPlaceholder />}>
+              <WakaTimeStats />
+            </DeferredSection>
+            <DeferredSection rootMargin="300px 0px" placeholder={<MetricsPlaceholder />}>
+              <DeveloperMetrics />
             </DeferredSection>
             <DeferredSection className="min-h-[420px]">
               <Skills />
