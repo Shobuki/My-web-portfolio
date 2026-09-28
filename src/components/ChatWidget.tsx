@@ -196,6 +196,9 @@ export default function ChatWidget() {
         setBotOnline(false);
         return;
       }
+      if (!data.text.trim()) {
+        throw new Error("Chat returned an empty response");
+      }
       setBotOnline(true);
       setMessages((current) => [
         ...current,
@@ -268,7 +271,9 @@ export default function ChatWidget() {
                 </div>
               </div>
             ))}
-            {sending && <p className="text-xs text-text-secondary">Thinking...</p>}
+            {sending && botOnline === true && (
+              <p className="text-xs text-text-secondary">Thinking...</p>
+            )}
             <div ref={endRef} />
           </div>
 
