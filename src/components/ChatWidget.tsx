@@ -44,6 +44,7 @@ export default function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
+  const [botOnline, setBotOnline] = useState<boolean | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([WELCOME_MESSAGE]);
   const endRef = useRef<HTMLDivElement>(null);
   const historyLoadedRef = useRef(false);
@@ -71,9 +72,22 @@ export default function ChatWidget() {
       }
 
       setMessages(saved.length > 0 ? saved : [WELCOME_MESSAGE]);
+      setBotOnline(typeof data.botOnline === "boolean" ? data.botOnline : data.paused !== true);
       historyLoadedRef.current = true;
     } catch {
       // The chat can still start a new conversation if history is unavailable.
+    }
+  }, []);
+
+  const refreshStatus = useCallback(async () => {
+    try {
+      const response = await fetch("/api/chat/status", { cache: "no-store" });
+      const data = await response.json().catch(() => null);
+      if (response.ok && data && typeof data.botOnline === "boolean") {
+        setBotOnline(data.botOnline);
+      }
+    } catch {
+      // Keep the last known mode while the status endpoint reconnects.
     }
   }, []);
 
@@ -143,13 +157,18 @@ export default function ChatWidget() {
     void loadHistory().then(() => {
       if (!cancelled) stopStreamRef.current = connectRealtime();
     });
+    void refreshStatus();
+    const statusTimer = window.setInterval(() => {
+      void refreshStatus();
+    }, 60_000);
 
     return () => {
       cancelled = true;
+      window.clearInterval(statusTimer);
       stopStreamRef.current?.();
       stopStreamRef.current = null;
     };
-  }, [open, loadHistory, connectRealtime]);
+  }, [open, loadHistory, connectRealtime, refreshStatus]);
 
   async function sendMessage(event: FormEvent) {
     event.preventDefault();
@@ -173,6 +192,11 @@ export default function ChatWidget() {
       if (!response.ok || typeof data.text !== "string") {
         throw new Error("Chat request failed");
       }
+      if (data.paused === true) {
+        setBotOnline(false);
+        return;
+      }
+      setBotOnline(true);
       setMessages((current) => [
         ...current,
         { id: `${Date.now()}-assistant`, role: "assistant", text: data.text },
@@ -198,7 +222,14 @@ export default function ChatWidget() {
           <div className="flex items-center justify-between border-b border-outline-variant px-4 py-3">
             <div>
               <p className="font-semibold text-text-primary">Chat with Alfredo&apos;s AI</p>
-              <p className="text-xs text-text-secondary">Ask anything about the portfolio</p>
+              <p className="flex items-center gap-1.5 text-xs text-text-secondary">
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${
+                    botOnline === false ? "bg-amber-400" : botOnline === true ? "bg-emerald-400" : "bg-white/40"
+                  }`}
+                />
+                {botOnline === false ? "Human direct" : botOnline === true ? "Bot online" : "Checking status..."}
+              </p>
             </div>
             <button
               type="button"
@@ -211,6 +242,11 @@ export default function ChatWidget() {
           </div>
 
           <div className="flex-1 space-y-3 overflow-y-auto p-4">
+            {botOnline === false && (
+              <div className="rounded-xl border border-primary-red/40 bg-primary-red/10 px-3 py-2 text-xs leading-relaxed text-text-secondary">
+                Human direct is active. Your messages are saved, but the bot will stay silent until it is resumed from Forja.
+              </div>
+            )}
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -240,7 +276,7 @@ export default function ChatWidget() {
             <input
               value={input}
               onChange={(event) => setInput(event.target.value)}
-              placeholder="Type a message..."
+              placeholder={botOnline === false ? "Message the human owner..." : "Type a message..."}
               maxLength={4000}
               aria-label="Chat message"
               className="min-w-0 flex-1 rounded-xl border border-outline-variant bg-black/20 px-3 py-2 text-sm text-white outline-none placeholder:text-text-secondary focus:border-primary-red"
