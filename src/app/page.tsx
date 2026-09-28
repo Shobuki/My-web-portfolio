@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
+import ChatWidget from "@/components/ChatWidget";
 
 const Footer = dynamic(() => import("@/components/Footer"));
 const AboutSection = dynamic(() => import("@/components/about"));
@@ -136,6 +137,7 @@ export default function Home() {
       <DeferredSection className="min-h-[320px]">
         <Footer />
       </DeferredSection>
+      <ChatWidget />
     </div>
   );
 }

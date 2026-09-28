@@ -194,7 +194,7 @@ const MusicPlayer: React.FC = () => {
     // === SATU TOMBOL SAJA (FAB) ===
     const ToggleOpenCloseButton = (
         <button
-            className="fixed bottom-4 right-4 z-[60] rounded-full p-3 shadow-lg shadow-primary-black/40 bg-gradient-to-br from-primary-red to-[#b91c1c] text-white hover:scale-105 transition"
+            className="fixed bottom-4 left-4 z-[60] rounded-full p-3 shadow-lg shadow-primary-black/40 bg-gradient-to-br from-primary-red to-[#b91c1c] text-white hover:scale-105 transition"
             onClick={() => setShowPanel(prev => !prev)}
             aria-label={showPanel ? "Tutup music player" : "Buka music player"}
             title={showPanel ? "Tutup music player" : "Buka music player"}
@@ -211,7 +211,7 @@ const MusicPlayer: React.FC = () => {
             {/* PANEL PLAYER (slide tetap ada; handle & tombol close dihapus) */}
             <motion.div
                 className={`
-                    fixed bottom-4 right-0 z-50
+                    fixed bottom-4 left-0 z-50
                     w-11/12 max-w-xs md:max-w-md
                     md:bottom-10
                     p-0 md:p-0
@@ -225,11 +225,11 @@ const MusicPlayer: React.FC = () => {
                     boxShadow: "0 2px 24px #000c",
                     touchAction: 'pan-y',
                     // sisakan "sliver" saat tertutup supaya bisa di-drag buka
-                    right: showPanel ? 0 : `-${panelOffset - 4}px`,
+                    left: 0,
                     cursor: 'grab'
                 }}
-                animate={{ x: showPanel ? 0 : `calc(100% - ${panelOffset}px)` }}
-                initial={{ x: "100%" }}
+                animate={{ x: showPanel ? 0 : `calc(-100% + ${panelOffset}px)` }}
+                initial={{ x: "-100%" }}
                 drag="x"
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={0.15}
