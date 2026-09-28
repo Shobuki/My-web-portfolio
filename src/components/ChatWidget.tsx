@@ -1,40 +1,155 @@
 'use client'
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { MessageCircle, Send, X } from "lucide-react";
 
 type ChatMessage = {
   id: string;
-  role: "user" | "assistant";
+  role: "user" | "assistant" | "owner";
   text: string;
+  createdAt?: number;
 };
 
-const SESSION_KEY = "portfolio-chat-session";
+const WELCOME_MESSAGE: ChatMessage = {
+  id: "welcome",
+  role: "assistant",
+  text: "Hi! Ask me about Alfredo's projects, skills, experience, or how we can work together.",
+};
 
-function getSessionId() {
-  const existing = window.localStorage.getItem(SESSION_KEY);
-  if (existing) return existing;
-  const id = window.crypto.randomUUID();
-  window.localStorage.setItem(SESSION_KEY, id);
-  return id;
+type PersistedMessage = {
+  id?: unknown;
+  role?: unknown;
+  content?: unknown;
+  created_at?: unknown;
+};
+
+function toChatMessage(message: PersistedMessage): ChatMessage | null {
+  if (
+    typeof message.id !== "string" ||
+    typeof message.content !== "string" ||
+    !["user", "assistant", "owner"].includes(String(message.role))
+  ) {
+    return null;
+  }
+
+  return {
+    id: message.id,
+    role: message.role as ChatMessage["role"],
+    text: message.content,
+    createdAt: typeof message.created_at === "number" ? message.created_at : undefined,
+  };
 }
 
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      text: "Hi! Ask me about Alfredo's projects, skills, experience, or how we can work together.",
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([WELCOME_MESSAGE]);
   const endRef = useRef<HTMLDivElement>(null);
+  const historyLoadedRef = useRef(false);
+  const ownerCursorRef = useRef(0);
+  const seenMessageIdsRef = useRef(new Set<string>());
+  const stopStreamRef = useRef<null | (() => void)>(null);
+
+  const loadHistory = useCallback(async () => {
+    if (historyLoadedRef.current) return;
+
+    try {
+      const response = await fetch("/api/chat/history", { cache: "no-store" });
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !data || !Array.isArray(data.messages)) return;
+
+      const saved = (data.messages as PersistedMessage[])
+        .map(toChatMessage)
+        .filter((message): message is ChatMessage => message !== null);
+
+      for (const message of saved) {
+        seenMessageIdsRef.current.add(message.id);
+        if (message.role === "owner" && typeof message.createdAt === "number") {
+          ownerCursorRef.current = Math.max(ownerCursorRef.current, message.createdAt);
+        }
+      }
+
+      setMessages(saved.length > 0 ? saved : [WELCOME_MESSAGE]);
+      historyLoadedRef.current = true;
+    } catch {
+      // The chat can still start a new conversation if history is unavailable.
+    }
+  }, []);
+
+  const connectRealtime = useCallback(() => {
+    let stopped = false;
+    let reconnectTimer: number | undefined;
+    let source: EventSource | null = null;
+
+    const connect = () => {
+      if (stopped) return;
+
+      const params = new URLSearchParams({ after: String(ownerCursorRef.current) });
+      source = new EventSource(`/api/chat/stream?${params.toString()}`);
+
+      source.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data) as { messages?: PersistedMessage[] };
+          const incoming = Array.isArray(data.messages) ? data.messages : [];
+          const nextMessages: ChatMessage[] = [];
+
+          for (const rawMessage of incoming) {
+            const message = toChatMessage(rawMessage);
+            if (!message || message.role !== "owner" || seenMessageIdsRef.current.has(message.id)) {
+              continue;
+            }
+            seenMessageIdsRef.current.add(message.id);
+            if (typeof message.createdAt === "number") {
+              ownerCursorRef.current = Math.max(ownerCursorRef.current, message.createdAt);
+            }
+            nextMessages.push(message);
+          }
+
+          if (nextMessages.length > 0) {
+            setMessages((current) => [...current, ...nextMessages]);
+          }
+        } catch {
+          // Ignore malformed events and let the stream reconnect.
+        }
+      };
+
+      source.onerror = () => {
+        source?.close();
+        source = null;
+        if (!stopped) {
+          reconnectTimer = window.setTimeout(connect, 500);
+        }
+      };
+    };
+
+    connect();
+
+    return () => {
+      stopped = true;
+      if (reconnectTimer !== undefined) window.clearTimeout(reconnectTimer);
+      source?.close();
+    };
+  }, []);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, open]);
+
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+
+    void loadHistory().then(() => {
+      if (!cancelled) stopStreamRef.current = connectRealtime();
+    });
+
+    return () => {
+      cancelled = true;
+      stopStreamRef.current?.();
+      stopStreamRef.current = null;
+    };
+  }, [open, loadHistory, connectRealtime]);
 
   async function sendMessage(event: FormEvent) {
     event.preventDefault();
@@ -52,7 +167,7 @@ export default function ChatWidget() {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId: getSessionId(), message: text }),
+        body: JSON.stringify({ message: text }),
       });
       const data = await response.json();
       if (!response.ok || typeof data.text !== "string") {
@@ -108,11 +223,16 @@ export default function ChatWidget() {
                       : "rounded-bl-md bg-white/10 text-text-primary"
                   }`}
                 >
+                  {message.role === "owner" && (
+                    <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-primary-red">
+                      Alfredo
+                    </span>
+                  )}
                   {message.text}
                 </div>
               </div>
             ))}
-            {sending && <p className="text-xs text-text-secondary">Thinking…</p>}
+            {sending && <p className="text-xs text-text-secondary">Thinking...</p>}
             <div ref={endRef} />
           </div>
 

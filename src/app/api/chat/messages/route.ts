@@ -3,10 +3,12 @@ import { getChatSession, setChatSessionCookie } from "@/lib/chat-session";
 
 export const runtime = "nodejs";
 
-export async function POST(request: Request) {
+export async function GET(request: Request) {
   const { sessionId, isNew } = await getChatSession();
   const baseUrl = process.env.FORJA_WEBCHAT_URL?.replace(/\/$/, "");
   const token = process.env.FORJA_WEBCHAT_TOKEN;
+  const url = new URL(request.url);
+  const after = url.searchParams.get("after")?.trim() ?? "0";
 
   if (!baseUrl || !token) {
     const response = NextResponse.json({ error: "Chat is not configured." }, { status: 503 });
@@ -14,36 +16,27 @@ export async function POST(request: Request) {
     return response;
   }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON." }, { status: 400 });
-  }
-
-  const input = body as { message?: unknown };
-  const message = typeof input.message === "string" ? input.message.trim() : "";
-
-  if (!message || message.length > 4000) {
-    const response = NextResponse.json({ error: "Invalid message." }, { status: 400 });
+  if (!/^\d+(\.\d+)?$/.test(after)) {
+    const response = NextResponse.json({ error: "Invalid chat cursor." }, { status: 400 });
     if (isNew) setChatSessionCookie(response, sessionId);
     return response;
   }
 
-  try {
-    const response = await fetch(`${baseUrl}/webchat`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ sessionId, message }),
-      cache: "no-store",
-      signal: AbortSignal.timeout(30000),
-    });
+  const upstreamUrl = new URL(`${baseUrl}/webchat/messages`);
+  upstreamUrl.searchParams.set("sessionId", sessionId);
+  upstreamUrl.searchParams.set("after", after);
 
+  try {
+    const response = await fetch(upstreamUrl, {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store",
+      signal: AbortSignal.timeout(10000),
+    });
     const data = await response.json().catch(() => ({ error: "Invalid response from chat service." }));
-    const result = NextResponse.json(data, { status: response.status });
+    const result = NextResponse.json(data, {
+      status: response.status,
+      headers: { "Cache-Control": "no-store" },
+    });
     if (isNew) setChatSessionCookie(result, sessionId);
     return result;
   } catch {
