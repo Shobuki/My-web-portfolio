@@ -21,11 +21,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON." }, { status: 400 });
   }
 
-  const input = body as { message?: unknown };
+  const input = body as { message?: unknown; displayName?: unknown };
   const message = typeof input.message === "string" ? input.message.trim() : "";
+  const displayName = typeof input.displayName === "string"
+    ? input.displayName.trim().replace(/\s+/g, " ").slice(0, 120)
+    : "";
 
-  if (!message || message.length > 4000) {
-    const response = NextResponse.json({ error: "Invalid message." }, { status: 400 });
+  if (!message || message.length > 4000 || displayName.length < 2) {
+    const response = NextResponse.json({ error: "A valid name and message are required." }, { status: 400 });
     if (isNew) setChatSessionCookie(response, sessionId);
     return response;
   }
@@ -37,7 +40,7 @@ export async function POST(request: Request) {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ sessionId, message }),
+      body: JSON.stringify({ sessionId, message, displayName }),
       cache: "no-store",
       signal: AbortSignal.timeout(30000),
     });

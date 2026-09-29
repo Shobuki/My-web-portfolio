@@ -16,6 +16,8 @@ const WELCOME_MESSAGE: ChatMessage = {
   text: "Hi! Ask me about Alfredo's projects, skills, experience, or how we can work together.",
 };
 
+const CHAT_NAME_STORAGE_KEY = "portfolio_chat_name";
+
 type PersistedMessage = {
   id?: unknown;
   role?: unknown;
@@ -42,6 +44,11 @@ function toChatMessage(message: PersistedMessage): ChatMessage | null {
 
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
+  const [visitorName, setVisitorName] = useState<string | null>(null);
+  const [nameInput, setNameInput] = useState("");
+  const [nameError, setNameError] = useState("");
+  const [identityReady, setIdentityReady] = useState(false);
+  const [savingName, setSavingName] = useState(false);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [botOnline, setBotOnline] = useState<boolean | null>(null);
@@ -51,6 +58,48 @@ export default function ChatWidget() {
   const ownerCursorRef = useRef(0);
   const seenMessageIdsRef = useRef(new Set<string>());
   const stopStreamRef = useRef<null | (() => void)>(null);
+
+  useEffect(() => {
+    try {
+      const savedName = window.localStorage.getItem(CHAT_NAME_STORAGE_KEY)?.trim() ?? "";
+      if (savedName) {
+        setNameInput(savedName);
+      }
+    } catch {
+      // The name prompt still works if browser storage is unavailable.
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    setIdentityReady(false);
+
+    void fetch("/api/chat/identity", { cache: "no-store" })
+      .then(async (response) => {
+        const data = await response.json().catch(() => null);
+        if (cancelled || !response.ok || !data || typeof data.displayName !== "string") return;
+        const serverName = data.displayName.trim();
+        if (!serverName) return;
+        setVisitorName(serverName);
+        setNameInput(serverName);
+        try {
+          window.localStorage.setItem(CHAT_NAME_STORAGE_KEY, serverName);
+        } catch {
+          // The server-side identity remains authoritative.
+        }
+      })
+      .catch(() => {
+        // The form can still try to register the name server-side.
+      })
+      .finally(() => {
+        if (!cancelled) setIdentityReady(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
 
   const loadHistory = useCallback(async () => {
     if (historyLoadedRef.current) return;
@@ -151,7 +200,7 @@ export default function ChatWidget() {
   }, [messages, open]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !identityReady || !visitorName) return;
     let cancelled = false;
 
     void loadHistory().then(() => {
@@ -168,12 +217,48 @@ export default function ChatWidget() {
       stopStreamRef.current?.();
       stopStreamRef.current = null;
     };
-  }, [open, loadHistory, connectRealtime, refreshStatus]);
+  }, [open, identityReady, visitorName, loadHistory, connectRealtime, refreshStatus]);
+
+  async function saveVisitorName(event: FormEvent) {
+    event.preventDefault();
+    const normalizedName = nameInput.trim().replace(/\s+/g, " ");
+    if (normalizedName.length < 2 || savingName) {
+      setNameError("Please enter at least 2 characters.");
+      return;
+    }
+
+    setNameError("");
+    setSavingName(true);
+    try {
+      const response = await fetch("/api/chat/identity", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ displayName: normalizedName.slice(0, 120) }),
+      });
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !data || typeof data.displayName !== "string" || !data.displayName.trim()) {
+        throw new Error("Could not save name");
+      }
+
+      const canonicalName = data.displayName.trim();
+      setVisitorName(canonicalName);
+      setNameInput(canonicalName);
+      try {
+        window.localStorage.setItem(CHAT_NAME_STORAGE_KEY, canonicalName);
+      } catch {
+        // The server-side identity remains authoritative.
+      }
+    } catch {
+      setNameError("Could not save your name. Please try again.");
+    } finally {
+      setSavingName(false);
+    }
+  }
 
   async function sendMessage(event: FormEvent) {
     event.preventDefault();
     const text = input.trim();
-    if (!text || sending) return;
+    if (!visitorName || !text || sending) return;
 
     setInput("");
     setMessages((current) => [
@@ -186,7 +271,7 @@ export default function ChatWidget() {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({ message: text, displayName: visitorName }),
       });
       const data = await response.json();
       if (!response.ok || typeof data.text !== "string") {
@@ -231,7 +316,15 @@ export default function ChatWidget() {
                     botOnline === false ? "bg-amber-400" : botOnline === true ? "bg-emerald-400" : "bg-white/40"
                   }`}
                 />
-                {botOnline === false ? "Human direct" : botOnline === true ? "Bot online" : "Checking status..."}
+                {!identityReady
+                  ? "Checking your chat..."
+                  : !visitorName
+                    ? "Enter your name to start"
+                    : botOnline === false
+                      ? "Human direct"
+                      : botOnline === true
+                        ? "Bot online"
+                        : "Checking status..."}
               </p>
             </div>
             <button
@@ -244,63 +337,108 @@ export default function ChatWidget() {
             </button>
           </div>
 
-          <div className="flex-1 space-y-3 overflow-y-auto p-4">
-            {botOnline === false && (
-              <div className="rounded-xl border border-primary-red/40 bg-primary-red/10 px-3 py-2 text-xs leading-relaxed text-text-secondary">
-                Human direct is active. Your messages are saved, but the bot will stay silent until it is resumed from Forja.
+          {!identityReady ? (
+            <div className="flex flex-1 items-center justify-center p-5 text-center text-sm text-text-secondary">
+              Checking your chat identity...
+            </div>
+          ) : !visitorName ? (
+            <div className="flex flex-1 flex-col justify-center p-5">
+              <div className="rounded-2xl border border-outline-variant bg-black/15 p-4">
+                <p className="mb-2 font-semibold text-text-primary">Before we start</p>
+                <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+                  Please enter your name so Alfredo can recognize this conversation.
+                </p>
+                <form onSubmit={saveVisitorName} className="space-y-3">
+                  <input
+                    value={nameInput}
+                    onChange={(event) => {
+                      setNameInput(event.target.value);
+                      setNameError("");
+                    }}
+                    placeholder="Your name"
+                    maxLength={120}
+                    autoFocus
+                    required
+                    aria-label="Your name"
+                    className="w-full rounded-xl border border-outline-variant bg-black/20 px-3 py-2.5 text-sm text-white outline-none placeholder:text-text-secondary focus:border-primary-red"
+                  />
+                  {nameError && <p className="text-xs text-red-300">{nameError}</p>}
+                  <button
+                    type="submit"
+                    disabled={savingName}
+                    className="w-full rounded-xl bg-primary-red px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-400"
+                  >
+                    {savingName ? "Saving..." : "Continue to chat"}
+                  </button>
+                </form>
               </div>
-            )}
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm leading-relaxed ${
-                    message.role === "user"
-                      ? "rounded-br-md bg-primary-red text-white"
-                      : "rounded-bl-md bg-white/10 text-text-primary"
-                  }`}
-                >
-                  {message.role === "owner" && (
-                    <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-primary-red">
-                      Alfredo
-                    </span>
-                  )}
-                  {message.text}
-                </div>
+            </div>
+          ) : (
+            <>
+              <div className="flex-1 space-y-3 overflow-y-auto p-4">
+                {botOnline === false && (
+                  <div className="rounded-xl border border-primary-red/40 bg-primary-red/10 px-3 py-2 text-xs leading-relaxed text-text-secondary">
+                    Human direct is active. Your messages are saved, but the bot will stay silent until it is resumed from Forja.
+                  </div>
+                )}
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                  >
+                    <div
+                      className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm leading-relaxed ${
+                        message.role === "user"
+                          ? "rounded-br-md bg-primary-red text-white"
+                          : "rounded-bl-md bg-white/10 text-text-primary"
+                      }`}
+                    >
+                      {message.role === "owner" && (
+                        <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-primary-red">
+                          Alfredo
+                        </span>
+                      )}
+                      {message.text}
+                    </div>
+                  </div>
+                ))}
+                {sending && botOnline === true && (
+                  <p className="text-xs text-text-secondary">Thinking...</p>
+                )}
+                <div ref={endRef} />
               </div>
-            ))}
-            {sending && botOnline === true && (
-              <p className="text-xs text-text-secondary">Thinking...</p>
-            )}
-            <div ref={endRef} />
-          </div>
 
-          <form onSubmit={sendMessage} className="flex gap-2 border-t border-outline-variant p-3">
-            <input
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              placeholder={botOnline === false ? "Message the human owner..." : "Type a message..."}
-              maxLength={4000}
-              aria-label="Chat message"
-              className="min-w-0 flex-1 rounded-xl border border-outline-variant bg-black/20 px-3 py-2 text-sm text-white outline-none placeholder:text-text-secondary focus:border-primary-red"
-            />
-            <button
-              type="submit"
-              disabled={!input.trim() || sending}
-              aria-label="Send message"
-              className="rounded-xl bg-primary-red p-2.5 text-white transition hover:bg-red-400 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Send size={17} />
-            </button>
-          </form>
+              <form onSubmit={sendMessage} className="flex gap-2 border-t border-outline-variant p-3">
+                <input
+                  value={input}
+                  onChange={(event) => setInput(event.target.value)}
+                  placeholder={botOnline === false ? "Message the human owner..." : "Type a message..."}
+                  maxLength={4000}
+                  aria-label="Chat message"
+                  className="min-w-0 flex-1 rounded-xl border border-outline-variant bg-black/20 px-3 py-2 text-sm text-white outline-none placeholder:text-text-secondary focus:border-primary-red"
+                />
+                <button
+                  type="submit"
+                  disabled={!input.trim() || sending}
+                  aria-label="Send message"
+                  className="rounded-xl bg-primary-red p-2.5 text-white transition hover:bg-red-400 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <Send size={17} />
+                </button>
+              </form>
+            </>
+          )}
         </div>
       )}
 
       <button
         type="button"
-        onClick={() => setOpen((current) => !current)}
+        onClick={() =>
+          setOpen((current) => {
+            if (!current) setIdentityReady(false);
+            return !current;
+          })
+        }
         aria-label={open ? "Close chat" : "Open chat"}
         className="ml-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary-red text-white shadow-lg shadow-red-950/40 transition hover:scale-105 hover:bg-red-400"
       >
